@@ -37,7 +37,7 @@ make a test pass. The developer decides.
 
 ---
 
-## Task 5.2: T1 Solo Fire and T5 Determinism
+## Task 5.2: T1 Solo Fire and T5 Determinism [DONE]
 
 Depends on: Task 5.1
 
