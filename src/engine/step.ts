@@ -11,6 +11,7 @@
 //   6. If minute reached the session end, set `ended` and log `session_ended`.
 
 import { advanceActions, applyActionMinuteEffects } from "./actions/framework";
+import { applyHourlyHealth } from "./body";
 import type { WeatherState } from "./config";
 import { logEvent } from "./events";
 import type { World } from "./state";
@@ -21,8 +22,13 @@ function applyPerMinuteEffects(world: World): void {
   applyActionMinuteEffects(world);
 }
 
-/** Step 4 hook: hourly effects for the hour that just ended. Tasks 4.2–4.5 fill this in. */
-function applyHourlyEffects(_world: World, _endedHour: number): void {}
+/**
+ * Step 4: hourly effects for the hour that just ended. Health runs first, so
+ * protection uses the shelter as it was during that hour.
+ */
+function applyHourlyEffects(world: World, endedHour: number): void {
+  applyHourlyHealth(world, endedHour);
+}
 
 /** Step 5: actions for each character. */
 function advanceCharacters(world: World): void {

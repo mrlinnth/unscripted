@@ -111,6 +111,7 @@
   },
   "health": {
     "max": 100,
+    "damageWeather": ["storm"],
     "stormDamagePerHour": 5,
     "sleepHealPerHour": 2,
     "workMinimum": 30

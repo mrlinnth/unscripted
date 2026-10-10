@@ -73,7 +73,6 @@ function createCharacter(id: CharacterId, rules: WorldRules): Character {
     fatigue: rules.starting.fatigue * 2,
     health: rules.starting.health,
     alive: true,
-    asleep: false,
     inventory: [],
     knownLocations: [...knowledge.knownLocations],
     seenLocations: [...knowledge.seenLocations],

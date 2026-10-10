@@ -70,7 +70,7 @@ Rules for every task in this file:
 
 ---
 
-## Task 4.2: Fatigue, Health, Sleep, Collapse, Death
+## Task 4.2: Fatigue, Health, Sleep, Collapse, Death [DONE]
 
 Depends on: Task 4.1
 

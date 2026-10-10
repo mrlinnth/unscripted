@@ -54,7 +54,6 @@ export interface Character {
   fatigue: number;
   health: number;
   alive: boolean;
-  asleep: boolean;
   inventory: Item[];
   knownLocations: LocationId[];
   /** Known to exist (seen from afar) but not reachable by a known route. */

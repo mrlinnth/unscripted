@@ -93,6 +93,8 @@ export interface WorldRules {
   };
   health: {
     max: number;
+    /** Weather that costs health each hour outside protection (A.9). */
+    damageWeather: WeatherState[];
     stormDamagePerHour: number;
     sleepHealPerHour: number;
     workMinimum: number;
@@ -333,6 +335,9 @@ export function validateWorldRules(rules: WorldRules): void {
   if (fatigue.collapseWakeBelow > fatigue.collapseAt) {
     throw new RulesError("fatigue.collapseWakeBelow", "must not be above collapseAt");
   }
+
+  // Health.
+  rules.health.damageWeather.forEach((s, i) => checkWeather(`health.damageWeather[${i}]`, s));
 
   // Shelter.
   checkLocation("shelter.location", rules.shelter.location);

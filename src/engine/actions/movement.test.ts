@@ -51,8 +51,8 @@ describe("move", () => {
     const world = setup({ 11: "heavy_rain" }); // hour 11 = 19:00 on Day 1
     const player = world.characters.player;
     place(player, "forest", [["forest", "hilltop"]]);
-    player.fatigue = TIRED;
     stepMinutes(world, at(1, "19:00"));
+    player.fatigue = TIRED; // set after waiting, since idle time adds fatigue
 
     expect(submitAction(world, "player", { type: "move", to: "hilltop" })).toEqual({ ok: true });
     expect(durationOf(player)).toBe(113);

@@ -18,7 +18,9 @@ export type Action =
   | { type: "install_tarp" }
   | { type: "observe_weather" }
   | { type: "sleep"; minutes?: number }
-  | { type: "wait"; minutes: number };
+  | { type: "wait"; minutes: number }
+  /** Internal: started by the engine on collapse (A.8); cannot be chosen. */
+  | { type: "collapse" };
 
 export type ActionType = Action["type"];
 
