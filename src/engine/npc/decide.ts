@@ -31,7 +31,7 @@ export interface NpcChoice {
 
 const PRIORITY_ORDER: Record<NpcPriority, number> = { high: 0, medium: 1, low: 2 };
 
-function sameAction(a: Action, b: Action): boolean {
+export function sameAction(a: Action, b: Action): boolean {
   return JSON.stringify(actionJson(a)) === JSON.stringify(actionJson(b));
 }
 
@@ -105,6 +105,29 @@ function planStep(
   return null;
 }
 
+/** Rule a condition: Exhausted, or night and Tired. */
+function needsRest(view: NpcView): boolean {
+  return view.self.fatigue === "exhausted" || (view.night && view.self.fatigue === "tired");
+}
+
+/** Rule b condition: cover weather while not protected here. */
+function needsCover(view: NpcView): boolean {
+  return view.behavior.coverWeather.includes(view.weather.current) && !isProtectedFor(view, view.self.location);
+}
+
+/** Rule c condition: health below the threshold. */
+function hasLowHealth(view: NpcView): boolean {
+  return view.self.health < view.behavior.lowHealth;
+}
+
+/** The first urgent rule (a–c) whose condition is true now, or null. */
+export function urgentRule(view: NpcView): DecisionRule | null {
+  if (needsRest(view)) return "a";
+  if (needsCover(view)) return "b";
+  if (hasLowHealth(view)) return "c";
+  return null;
+}
+
 export function decide(view: NpcView, rng: Rng, exclude: Action[] = []): NpcChoice {
   const changes = goalChanges(view);
   const changed = new Set(changes.map((c) => c.id));
@@ -117,12 +140,9 @@ export function decide(view: NpcView, rng: Rng, exclude: Action[] = []): NpcChoi
   const base = { goalChanges: changes };
   // Rules a–c leave the plan as it is, so the NPC can pick it up afterwards.
   const keepPlan = { plan: view.npc.plan, planEvent: null };
-  const here = view.self.location;
-  const fatigue = view.self.fatigue;
-
   // a. Exhausted, or night and Tired: rest.
-  if (fatigue === "exhausted" || (view.night && fatigue === "tired")) {
-    const why = fatigue === "exhausted" ? "Exhausted" : "night, Tired";
+  if (needsRest(view)) {
+    const why = view.self.fatigue === "exhausted" ? "Exhausted" : "night, Tired";
     const rest = restAction(view, rng);
     if (!excluded(rest.action, exclude)) {
       const reason = rest.to === null ? `sleep: ${why}` : `go to ${rest.to} to sleep: ${why}`;
@@ -132,7 +152,7 @@ export function decide(view: NpcView, rng: Rng, exclude: Action[] = []): NpcChoi
 
   // b. Bad weather while not protected: take cover.
   const weather = view.weather.current;
-  if (view.behavior.coverWeather.includes(weather) && !isProtectedFor(view, here)) {
+  if (needsCover(view)) {
     const pick = pickNearest(view, rng);
     const next = pick?.path[0];
     if (pick && next !== undefined) {
@@ -144,7 +164,7 @@ export function decide(view: NpcView, rng: Rng, exclude: Action[] = []): NpcChoi
   }
 
   // c. Low health: rest under protection.
-  if (view.self.health < view.behavior.lowHealth) {
+  if (hasLowHealth(view)) {
     const rest = restAction(view, rng);
     if (!excluded(rest.action, exclude)) {
       const why = `health ${view.self.health}`;

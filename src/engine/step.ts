@@ -10,6 +10,7 @@
 //      weather differs.
 //   5. Per character, in CHARACTER_IDS order: re-check, complete, and
 //      collapse.
+//   5b. If autonomy is on: NPC decisions, npc1 then npc2 (npc/loop.ts).
 //   6. If minute reached the session end, set `ended` and log `session_ended`.
 
 import { applyFireMinute, applyHourlyDrying, applyWetWoodMinute } from "./actions/fire";
@@ -18,6 +19,7 @@ import { applyHourlyShelterLoss } from "./actions/shelter";
 import { applyHourlyHealth } from "./body";
 import type { WeatherState } from "./config";
 import { logEvent } from "./events";
+import { runNpcDecisions } from "./npc/loop";
 import type { World } from "./state";
 import { hourIndex, isOnTheHour, sessionLengthMinutes } from "./time";
 
@@ -65,6 +67,11 @@ export function step(world: World): void {
   }
 
   advanceCharacters(world);
+
+  // Not at the end minute: the session is over and every action would be rejected.
+  if (world.minute < endMinute) {
+    runNpcDecisions(world);
+  }
 
   if (world.minute >= endMinute) {
     world.ended = true;

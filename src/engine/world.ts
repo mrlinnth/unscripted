@@ -1,6 +1,7 @@
 // Creates a new world in its starting state (spec A.3, A.11).
 
 import { loadWorldRules, type RulesOverrides, type WeatherState, type WorldRules } from "./config";
+import { runNpcDecisions } from "./npc/loop";
 import { loadNpcConfig, type NpcConfigOverrides } from "./npc/profiles";
 import { createNpcStates } from "./npc/state";
 import { createRng } from "./rng";
@@ -59,7 +60,7 @@ export function createWorld(seed: number, options: CreateWorldOptions = {}): Wor
     characters[id] = createCharacter(id, rules);
   }
 
-  return {
+  const world: World = {
     seed,
     rules,
     minute: 0,
@@ -77,6 +78,9 @@ export function createWorld(seed: number, options: CreateWorldOptions = {}): Wor
     events: [],
     nextItemId: 1,
   };
+  // NPCs start acting at session start, not one minute in.
+  runNpcDecisions(world);
+  return world;
 }
 
 function createCharacter(id: CharacterId, rules: WorldRules): Character {

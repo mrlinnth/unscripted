@@ -55,7 +55,7 @@ Rules for every task in this file:
 
 ---
 
-## Task 3.2: Decision Loop in Step
+## Task 3.2: Decision Loop in Step [DONE]
 
 Depends on: Task 3.1
 
