@@ -9,7 +9,7 @@ target. If the engine gives a different result, stop and report what the engine
 produces and why. Do not change the expected values, the config, or the spec to
 make a test pass. The developer decides.
 
-## Task 5.1: Scenario Harness
+## Task 5.1: Scenario Harness [DONE]
 
 ### Subtasks
 - Create `src/engine/scenarios/harness.ts` with
