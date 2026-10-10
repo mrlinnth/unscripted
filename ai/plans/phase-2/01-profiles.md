@@ -13,7 +13,7 @@ Rules for every task in this file:
 - With autonomy off, the event log for any seed and script must stay exactly
   as it is today. T1–T5 must keep passing unchanged.
 
-## Task 1.1: Profile Config and Loader
+## Task 1.1: Profile Config and Loader [DONE]
 
 ### Subtasks
 - Create `src/engine/config/npcs.json` with:

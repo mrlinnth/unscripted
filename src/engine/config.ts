@@ -138,7 +138,7 @@ const shippedRules: WorldRules = rawRules;
 
 export type RulesOverrides = DeepPartial<WorldRules>;
 
-type DeepPartial<T> = T extends unknown[]
+export type DeepPartial<T> = T extends unknown[]
   ? T
   : T extends object
     ? { [K in keyof T]?: DeepPartial<T[K]> }
@@ -151,7 +151,7 @@ function isPlainObject(value: unknown): value is PlainObject {
 }
 
 /** Merges objects key by key. Arrays and plain values in `overrides` replace the base. */
-function deepMerge(base: unknown, overrides: unknown): unknown {
+export function deepMerge(base: unknown, overrides: unknown): unknown {
   if (!isPlainObject(base) || !isPlainObject(overrides)) {
     return overrides === undefined ? base : overrides;
   }

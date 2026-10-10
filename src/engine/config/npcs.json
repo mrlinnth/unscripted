@@ -1,0 +1,50 @@
+{
+  "behavior": {
+    "lowHealth": 50,
+    "idleWaitMinutes": 30,
+    "reviewEveryMinutes": 180,
+    "shelterTarget": 80,
+    "woodReserve": 1
+  },
+  "npcs": {
+    "npc1": {
+      "identity": {
+        "name": "Marcus Hale",
+        "age": 52,
+        "background": "Retired boat mechanic. Ran a small fishing-boat repair yard for 25 years.",
+        "traits": ["practical", "stubborn", "careful", "trusts what he can build with his hands"],
+        "values": ["safety first", "look after people close by", "finish what you start"],
+        "skills": ["repairs", "rope work", "reading the sea"],
+        "weaknesses": ["impatient with plans he didn't make", "slow to trust strangers"],
+        "pastExperiences": ["Lost a boat and a crewman in a storm years ago."],
+        "fears": ["being caught outside in a storm"]
+      },
+      "goals": [
+        { "id": "make_camp_safe", "priority": "high" },
+        { "id": "keep_wood_reserve", "priority": "low" }
+      ],
+      "trust": { "npc2": 40, "player": 40 },
+      "commitments": []
+    },
+    "npc2": {
+      "identity": {
+        "name": "Sarah Okafor",
+        "age": 34,
+        "background": "Field geologist. On the trip to survey coastal rock.",
+        "traits": ["curious", "independent", "restless", "confident"],
+        "values": ["knowledge", "freedom to act on her own", "being useful"],
+        "skills": ["maps", "navigation", "reading terrain"],
+        "weaknesses": ["takes risks", "doesn't ask for help"],
+        "pastExperiences": ["Used to working alone in remote places."],
+        "fears": ["being stuck and doing nothing"]
+      },
+      "goals": [
+        { "id": "map_island", "priority": "high" },
+        { "id": "keep_flashlight", "priority": "medium" },
+        { "id": "signal_rescue", "priority": "low" }
+      ],
+      "trust": { "npc1": 50, "player": 50 },
+      "commitments": []
+    }
+  }
+}
