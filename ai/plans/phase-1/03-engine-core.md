@@ -46,7 +46,7 @@ Rules for every task in this file:
 
 ---
 
-## Task 3.2: Seeded RNG, Weather, and Search Order
+## Task 3.2: Seeded RNG, Weather, and Search Order [DONE]
 
 Depends on: Task 3.1
 
