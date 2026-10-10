@@ -11,7 +11,7 @@ Rules for every task in this file:
 - No Appendix A number appears in engine code. All come from the config.
 - Strict TypeScript, no `any`, explicit return types on exported functions.
 
-## Task 3.1: World Rules Config
+## Task 3.1: World Rules Config [DONE]
 
 ### Subtasks
 - Create `src/engine/config/world-rules.json` holding every Appendix A number in

@@ -1,0 +1,149 @@
+{
+  "session": {
+    "start": { "day": 1, "time": "08:00" },
+    "end": { "day": 3, "time": "08:00" }
+  },
+  "dayNight": {
+    "daylightStart": "06:00",
+    "nightStart": "18:30"
+  },
+  "locations": [
+    { "id": "beach_camp", "name": "Beach Camp" },
+    { "id": "forest", "name": "Forest" },
+    { "id": "wreckage", "name": "Wreckage" },
+    { "id": "cave", "name": "Cave" },
+    { "id": "hilltop", "name": "Hilltop" }
+  ],
+  "routes": [
+    { "from": "beach_camp", "to": "forest", "minutes": 20, "closedIn": [] },
+    { "from": "beach_camp", "to": "wreckage", "minutes": 30, "closedIn": [] },
+    { "from": "forest", "to": "cave", "minutes": 25, "closedIn": [] },
+    { "from": "forest", "to": "hilltop", "minutes": 40, "closedIn": [] },
+    { "from": "cave", "to": "hilltop", "minutes": 30, "closedIn": ["storm"] }
+  ],
+  "travelModifiers": {
+    "nightWithoutFlashlight": 1.5,
+    "weather": { "heavy_rain": 1.5, "storm": 1.5 },
+    "fatigue": { "tired": 1.25, "exhausted": 1.5 }
+  },
+  "startingKnowledge": {
+    "knownLocations": ["beach_camp", "forest", "wreckage"],
+    "seenLocations": ["hilltop"],
+    "knownRoutes": [
+      ["beach_camp", "forest"],
+      ["beach_camp", "wreckage"]
+    ]
+  },
+  "explore": {
+    "defaultMinutes": 30,
+    "byLocation": {
+      "forest": {
+        "minutes": 45,
+        "revealsLocations": ["cave"],
+        "revealsRoutes": [
+          ["forest", "cave"],
+          ["forest", "hilltop"]
+        ]
+      },
+      "cave": {
+        "minutes": 30,
+        "revealsLocations": [],
+        "revealsRoutes": [["cave", "hilltop"]]
+      }
+    }
+  },
+  "carrySlots": 2,
+  "items": {
+    "wood": { "name": "Wood bundle", "slots": 1 },
+    "lighter": { "name": "Lighter", "slots": 0, "uses": 3 },
+    "tarp": { "name": "Tarp", "slots": 1 },
+    "flashlight": { "name": "Flashlight", "slots": 0, "batteryMinutes": 360 }
+  },
+  "wreckage": {
+    "location": "wreckage",
+    "items": ["lighter", "tarp", "flashlight"]
+  },
+  "signalFire": {
+    "location": "hilltop",
+    "buildWood": 6,
+    "startFuelHours": 4,
+    "addFuelHours": 1,
+    "maxFuelHours": 8,
+    "burnPerHour": {
+      "clear": 1,
+      "cloudy": 1,
+      "light_rain": 1.5,
+      "heavy_rain": 2,
+      "storm": 2
+    },
+    "goOutWeather": ["heavy_rain", "storm"],
+    "goOutBelowHours": 2,
+    "lightBlockedWeather": ["heavy_rain", "storm"]
+  },
+  "wetWood": {
+    "wetWeather": ["light_rain", "heavy_rain", "storm"],
+    "dryWeather": ["clear", "cloudy"],
+    "dryAfterHours": 2
+  },
+  "weather": {
+    "states": ["clear", "cloudy", "light_rain", "heavy_rain", "storm"],
+    "stayChance": 0.8,
+    "stormMaxHours": 3,
+    "observeForecastLocation": "hilltop",
+    "observeForecastHours": 2
+  },
+  "fatigue": {
+    "perMinute": {
+      "work": 1,
+      "travel": 1,
+      "interact": 1,
+      "idle": 0.5
+    },
+    "sleepPerMinute": {
+      "shelteredCamp": -2,
+      "cave": -1.5,
+      "elsewhere": -1
+    },
+    "tiredAt": 480,
+    "exhaustedAt": 720,
+    "collapseAt": 960,
+    "collapseWakeBelow": 480
+  },
+  "health": {
+    "max": 100,
+    "stormDamagePerHour": 5,
+    "sleepHealPerHour": 2,
+    "workMinimum": 30
+  },
+  "shelter": {
+    "location": "beach_camp",
+    "naturalShelters": ["cave"],
+    "max": 100,
+    "protectsAt": 30,
+    "repairAmount": 20,
+    "repairWood": 1,
+    "tarpAmount": 30,
+    "lossPerHour": { "storm": 10, "heavy_rain": 2 }
+  },
+  "actions": {
+    "tiredWorkMultiplier": 1.25,
+    "gather_wood": { "minutes": 30, "location": "forest" },
+    "search": { "minutes": 30, "location": "wreckage" },
+    "take": { "minutes": 1 },
+    "drop": { "minutes": 1 },
+    "give": { "minutes": 1 },
+    "build_fire": { "minutes": 60, "location": "hilltop" },
+    "add_wood": { "minutes": 5, "location": "hilltop" },
+    "light_fire": { "minutes": 10, "location": "hilltop" },
+    "repair_shelter": { "minutes": 60, "location": "beach_camp" },
+    "install_tarp": { "minutes": 30, "location": "beach_camp" },
+    "observe_weather": { "minutes": 15 }
+  },
+  "starting": {
+    "location": "beach_camp",
+    "fatigue": 0,
+    "health": 100,
+    "shelter": 40,
+    "firstHourWeather": "clear"
+  }
+}

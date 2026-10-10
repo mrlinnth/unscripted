@@ -31,7 +31,9 @@ Rules for every task in this file:
     then complete when `minute` reaches start + duration and apply the effect.
   - Each action is defined by: validate, duration, recheck, complete. Keep it a
     plain object per action, not a class hierarchy.
-- Duration helper: base minutes × modifiers, rounded up. Work actions get the
+- Duration helper: base minutes × modifiers, rounded up. Round the product to
+  6 decimals before rounding up, so floating-point error in config multipliers
+  (for example 30 × 1.1 = 33.000000000000004) cannot add a minute. Work actions get the
   Tired work multiplier. Move gets the travel modifiers (A.3): night without
   active flashlight, Heavy Rain or Storm, Tired, Exhausted.
 - Move: needs a known route from here; route must be open (Cave – Hilltop closed
