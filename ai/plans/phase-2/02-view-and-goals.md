@@ -14,7 +14,7 @@ Rules for every task in this file:
   actions.
 - No randomness in this file's code. Ties are handled in Phase 3.
 
-## Task 2.1: NPC View
+## Task 2.1: NPC View [DONE]
 
 ### Subtasks
 - Create `src/engine/npc/view.ts` with `NpcView` and

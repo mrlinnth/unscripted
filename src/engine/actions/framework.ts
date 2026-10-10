@@ -67,6 +67,11 @@ function interrupt(world: World, character: Character, reason: string): void {
   logEvent(world, "action_interrupted", { action: actionJson(current.action), reason }, character.id);
 }
 
+/** True if the player or an NPC may cancel this action. */
+export function isCancellable(action: Action): boolean {
+  return defFor(action.type)?.cancellable ?? false;
+}
+
 /** How the character's current activity counts for fatigue. */
 export function activityKind(character: Character): ActivityKind {
   const current = character.action;
