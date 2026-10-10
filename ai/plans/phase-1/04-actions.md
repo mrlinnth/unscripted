@@ -16,7 +16,7 @@ Rules for every task in this file:
 - Tests use `createWorld` with forced weather and search order. No randomness
   in tests except through a fixed seed.
 
-## Task 4.1: Action Framework, Move, Explore, Wait, Observe Weather
+## Task 4.1: Action Framework, Move, Explore, Wait, Observe Weather [DONE]
 
 ### Subtasks
 - Create `src/engine/actions/types.ts`: an `Action` union type with one case per

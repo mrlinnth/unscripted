@@ -1,6 +1,7 @@
 // World state types. The world is plain JSON (no classes, no Maps), so it can
 // be saved, cloned, and compared in tests. Engine functions mutate it in place.
 
+import type { Action } from "./actions/types";
 import type { LocationId, RoutePair, WeatherState, WorldRules } from "./config";
 import type { GameEvent } from "./events";
 
@@ -38,11 +39,12 @@ export interface LocationState {
   items: Item[];
 }
 
-/** The action a character is doing. Filled in by Phase 4 (04-actions.md). */
+/** The action a character is doing. Its duration is fixed when it starts. */
 export interface CurrentAction {
-  type: string;
+  action: Action;
   startedAt: number;
-  endsAt: number;
+  /** Game minute it completes, or null if it ends on a condition (Sleep). */
+  endsAt: number | null;
 }
 
 export interface Character {

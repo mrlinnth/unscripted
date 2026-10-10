@@ -10,25 +10,24 @@
 //      complete actions (Phase 4).
 //   6. If minute reached the session end, set `ended` and log `session_ended`.
 
+import { advanceActions, applyActionMinuteEffects } from "./actions/framework";
 import type { WeatherState } from "./config";
 import { logEvent } from "./events";
 import type { World } from "./state";
 import { hourIndex, isOnTheHour, sessionLengthMinutes } from "./time";
 
-/** Weather at a game minute. The session end minute uses the last hour. */
-export function weatherAt(world: World, minute: number): WeatherState {
-  const index = Math.min(hourIndex(minute), world.weather.length - 1);
-  return world.weather[index] as WeatherState;
+/** Step 2: per-minute effects for the minute that just passed. */
+function applyPerMinuteEffects(world: World): void {
+  applyActionMinuteEffects(world);
 }
 
-/** Step 2 hook: per-minute effects (fatigue, fuel, battery). Phase 4 fills this in. */
-function applyPerMinuteEffects(_world: World): void {}
-
-/** Step 4 hook: hourly effects for the hour that just ended. Phase 4 fills this in. */
+/** Step 4 hook: hourly effects for the hour that just ended. Tasks 4.2–4.5 fill this in. */
 function applyHourlyEffects(_world: World, _endedHour: number): void {}
 
-/** Step 5 hook: actions for each character. Phase 4 fills this in. */
-function advanceCharacters(_world: World): void {}
+/** Step 5: actions for each character. */
+function advanceCharacters(world: World): void {
+  advanceActions(world);
+}
 
 export function step(world: World): void {
   if (world.ended) {

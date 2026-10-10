@@ -6,7 +6,14 @@
 
 import type { WeatherState, WorldRules } from "./config";
 import { nextFloat, type Rng } from "./rng";
-import { sessionHours } from "./time";
+import type { World } from "./state";
+import { hourIndex, sessionHours } from "./time";
+
+/** Weather at a game minute. The session end minute uses the last hour. */
+export function weatherAt(world: World, minute: number): WeatherState {
+  const index = Math.min(hourIndex(minute), world.weather.length - 1);
+  return world.weather[index] as WeatherState;
+}
 
 /**
  * Returns one weather state per session hour. Hour 0 is the configured first

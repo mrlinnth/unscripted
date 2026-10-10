@@ -3,8 +3,8 @@
 
 import type { WeatherState } from "./config";
 import type { Character, CharacterId, World } from "./state";
-import { weatherAt } from "./step";
 import { clockAt, dayAt, isNight } from "./time";
+import { weatherAt } from "./weather";
 
 export type { WorldRules, WeatherState, LocationId } from "./config";
 export type { GameEvent, GameEventType } from "./events";
@@ -12,6 +12,8 @@ export type { Character, CharacterId, Item, ItemKind, World } from "./state";
 export { CHARACTER_IDS } from "./state";
 export { createWorld, type CreateWorldOptions } from "./world";
 export { step, stepMinutes } from "./step";
+export { submitAction, cancelAction } from "./actions/framework";
+export type { Action, ActionType, SubmitResult } from "./actions/types";
 export { gameMinuteAt } from "./time";
 
 export interface GameClock {
