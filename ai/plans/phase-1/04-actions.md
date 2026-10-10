@@ -111,7 +111,7 @@ Depends on: Task 4.1
 
 ---
 
-## Task 4.3: Items, Search, Gather Wood
+## Task 4.3: Items, Search, Gather Wood [DONE]
 
 Depends on: Task 4.2
 

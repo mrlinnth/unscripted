@@ -297,9 +297,9 @@ describe("framework", () => {
 
   it("rejects actions that are not built yet", () => {
     const world = setup();
-    expect(submitAction(world, "player", { type: "search" })).toEqual({
+    expect(submitAction(world, "player", { type: "build_fire" })).toEqual({
       ok: false,
-      reason: "search is not available yet",
+      reason: "build_fire is not available yet",
     });
   });
 

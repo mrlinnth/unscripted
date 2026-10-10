@@ -8,6 +8,7 @@
 import { applyFatigueMinute, shouldCollapse } from "../body";
 import { logEvent } from "../events";
 import { CHARACTER_IDS, type Character, type CharacterId, type World } from "../state";
+import { itemActions } from "./items";
 import { actionJson, type JsonObject } from "./json";
 import { drainFlashlights, movementActions } from "./movement";
 import { restActions } from "./rest";
@@ -33,6 +34,7 @@ export type ActionDefs = { [T in ActionType]?: ActionDef<ActionOf<T>> };
 const actionDefs: ActionDefs = {
   ...movementActions,
   ...restActions,
+  ...itemActions,
 };
 
 function defFor(type: ActionType): ActionDef<Action> | undefined {
