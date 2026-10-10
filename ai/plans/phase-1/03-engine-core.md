@@ -80,7 +80,7 @@ Depends on: Task 3.1
 
 ---
 
-## Task 3.3: World State, Clock, and Event Log
+## Task 3.3: World State, Clock, and Event Log [DONE]
 
 Depends on: Task 3.2
 
