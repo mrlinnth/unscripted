@@ -62,7 +62,7 @@ Rules for every task in this file:
 
 ---
 
-## Task 2.2: Goal Planners
+## Task 2.2: Goal Planners [DONE]
 
 Depends on: Task 2.1
 

@@ -79,6 +79,8 @@ export interface NpcView {
     gatherLocation: LocationId;
     forecastLocation: LocationId;
     workHealthMinimum: number;
+    /** Weather that blocks lighting the fire (A.6). */
+    lightBlockedWeather: WeatherState[];
   };
 }
 
@@ -168,6 +170,7 @@ export function buildNpcView(world: World, id: NpcId): NpcView {
       gatherLocation: requiredLocation(rules.actions.gather_wood.location, "actions.gather_wood.location"),
       forecastLocation: rules.weather.observeForecastLocation,
       workHealthMinimum: rules.health.workMinimum,
+      lightBlockedWeather: rules.signalFire.lightBlockedWeather,
     },
   };
   // One deep copy at the end, so nothing in the view points into the world.
