@@ -1,0 +1,44 @@
+{
+  "type": "object",
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": [
+        "move",
+        "explore",
+        "gather_wood",
+        "search",
+        "take",
+        "drop",
+        "give",
+        "repair_shelter",
+        "install_tarp",
+        "build_fire",
+        "add_wood",
+        "light_fire",
+        "observe_weather",
+        "sleep",
+        "wait",
+        "talk"
+      ]
+    },
+    "target": {
+      "type": "string",
+      "description": "Location, item, or character the action is about. Empty string if none."
+    },
+    "reason": {
+      "type": "string",
+      "description": "One or two sentences, in the character's own view."
+    },
+    "plan_change": {
+      "type": "boolean",
+      "description": "True if this decision changes the current plan."
+    },
+    "new_plan": {
+      "type": "string",
+      "description": "Short new plan if plan_change is true, otherwise an empty string."
+    }
+  },
+  "required": ["action", "target", "reason", "plan_change", "new_plan"],
+  "additionalProperties": false
+}

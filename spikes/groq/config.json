@@ -1,0 +1,10 @@
+{
+  "base_url": "https://api.groq.com/openai/v1/chat/completions",
+  "models": {
+    "120b": "openai/gpt-oss-120b",
+    "20b": "openai/gpt-oss-20b"
+  },
+  "max_completion_tokens": 1024,
+  "reasoning_effort": "low",
+  "request_timeout_secs": 60
+}
