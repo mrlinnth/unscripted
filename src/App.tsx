@@ -1,15 +1,8 @@
-import { Container, Grid, Group, SegmentedControl, Stack, Title } from "@mantine/core";
+import { Container, Grid, Stack, Title } from "@mantine/core";
+import { Controls } from "./shell/Controls";
 import { EventLog } from "./shell/EventLog";
-import type { Speed } from "./shell/runner";
 import { useEngine } from "./shell/useEngine";
 import { WorldHeader, WorldView } from "./shell/WorldView";
-
-const SPEEDS: { label: string; value: string }[] = [
-  { label: "Pause", value: "0" },
-  { label: "1×", value: "1" },
-  { label: "2×", value: "2" },
-  { label: "4×", value: "4" },
-];
 
 function App() {
   const engine = useEngine();
@@ -18,19 +11,14 @@ function App() {
   return (
     <Container size="xl" py="md">
       <Stack gap="md">
-        <Group justify="space-between">
-          <Title order={2}>Unscripted</Title>
-          <SegmentedControl
-            data={SPEEDS}
-            value={String(engine.speed)}
-            onChange={(value) => engine.setSpeed(Number(value) as Speed)}
-            disabled={world.ended}
-          />
-        </Group>
+        <Title order={2}>Unscripted</Title>
         <WorldHeader world={world} speed={engine.speed} />
         <Grid>
           <Grid.Col span={{ base: 12, lg: 7 }}>
-            <WorldView world={world} />
+            <Stack gap="md">
+              <Controls engine={engine} />
+              <WorldView world={world} />
+            </Stack>
           </Grid.Col>
           <Grid.Col span={{ base: 12, lg: 5 }}>
             <EventLog world={world} />

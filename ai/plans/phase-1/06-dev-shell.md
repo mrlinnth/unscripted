@@ -38,7 +38,7 @@ Rules for every task in this file:
 
 ---
 
-## Task 6.2: World Truth View and Event Log
+## Task 6.2: World Truth View and Event Log [DONE]
 
 Depends on: Task 6.1
 

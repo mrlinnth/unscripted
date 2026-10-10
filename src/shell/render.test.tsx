@@ -7,6 +7,8 @@ import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import App from "../App";
 import { createWorld, stepMinutes, submitAction } from "../engine";
+import { createItem } from "../engine/actions/items";
+import { itemChoices } from "./Controls";
 import { EventLog } from "./EventLog";
 import { WorldView } from "./WorldView";
 
@@ -21,6 +23,20 @@ describe("dev shell render", () => {
     expect(html).toContain("Day <!-- -->1<!-- --> <!-- -->08:00");
     expect(html).toContain("paused");
     expect(html).toContain("Beach Camp");
+    for (const label of ["Move", "Gather wood", "Build fire", "Light fire", "Sleep until rested", "Skip to end of action"]) {
+      expect(html).toContain(label);
+    }
+  });
+
+  it("lists carried items first, then items here", () => {
+    const world = createWorld(1);
+    world.characters.player.inventory.push(createItem(world, "lighter"));
+    world.locations.beach_camp?.items.push(createItem(world, "wood"));
+    world.locations.forest?.items.push(createItem(world, "tarp"));
+    expect(itemChoices(world)).toEqual([
+      { value: "lighter-1", label: "lighter-1 (3 uses) — carried" },
+      { value: "wood-2", label: "wood-2 — here" },
+    ]);
   });
 
   it("renders a busy world: actions, items, fire, and events", () => {
