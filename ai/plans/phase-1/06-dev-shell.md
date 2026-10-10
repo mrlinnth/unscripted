@@ -11,7 +11,7 @@ Rules for every task in this file:
 - Use Mantine components only. No new packages.
 - Keep it simple: plain React state and hooks, no state library.
 
-## Task 6.1: Engine Runner Hook
+## Task 6.1: Engine Runner Hook [DONE]
 
 ### Subtasks
 - Create `src/shell/useEngine.ts`: a hook that owns one world object and
