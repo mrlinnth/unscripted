@@ -11,6 +11,7 @@
 //   6. If minute reached the session end, set `ended` and log `session_ended`.
 
 import { advanceActions, applyActionMinuteEffects } from "./actions/framework";
+import { applyHourlyShelterLoss } from "./actions/shelter";
 import { applyHourlyHealth } from "./body";
 import type { WeatherState } from "./config";
 import { logEvent } from "./events";
@@ -28,6 +29,7 @@ function applyPerMinuteEffects(world: World): void {
  */
 function applyHourlyEffects(world: World, endedHour: number): void {
   applyHourlyHealth(world, endedHour);
+  applyHourlyShelterLoss(world, endedHour);
 }
 
 /** Step 5: actions for each character. */

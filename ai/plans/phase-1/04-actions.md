@@ -143,7 +143,7 @@ Depends on: Task 4.2
 
 ---
 
-## Task 4.4: Shelter
+## Task 4.4: Shelter [DONE]
 
 Depends on: Task 4.3
 

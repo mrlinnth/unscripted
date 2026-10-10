@@ -159,6 +159,7 @@ describe("health (A.9)", () => {
     const world = setup({ 1: "storm", 2: "storm", 3: "storm" }); // 09:00–12:00
     world.characters.player.location = "forest";
     world.characters.npc1.location = "cave";
+    world.shelter.value = 100; // stays protective through three Storm hours of loss
     stepMinutes(world, 120); // 10:00
     expect(world.characters.player.health).toBe(95);
     stepMinutes(world, 120); // 12:00

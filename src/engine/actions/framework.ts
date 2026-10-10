@@ -12,6 +12,7 @@ import { itemActions } from "./items";
 import { actionJson, type JsonObject } from "./json";
 import { drainFlashlights, movementActions } from "./movement";
 import { restActions } from "./rest";
+import { shelterActions } from "./shelter";
 import type { Action, ActionOf, ActionType, ActivityKind, SubmitResult } from "./types";
 
 export interface ActionDef<A extends Action> {
@@ -35,6 +36,7 @@ const actionDefs: ActionDefs = {
   ...movementActions,
   ...restActions,
   ...itemActions,
+  ...shelterActions,
 };
 
 function defFor(type: ActionType): ActionDef<Action> | undefined {
