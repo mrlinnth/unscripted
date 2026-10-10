@@ -1,6 +1,8 @@
 // Creates a new world in its starting state (spec A.3, A.11).
 
 import { loadWorldRules, type RulesOverrides, type WeatherState, type WorldRules } from "./config";
+import { loadNpcConfig, type NpcConfigOverrides } from "./npc/profiles";
+import { createNpcStates } from "./npc/state";
 import { createRng } from "./rng";
 import {
   CHARACTER_IDS,
@@ -21,10 +23,15 @@ export interface CreateWorldOptions {
   weather?: WeatherState[];
   /** Forced Wreckage search order, replacing the rolled order (A.13). */
   searchOrder?: ItemKind[];
+  /** NPCs act on their own when true. Default false (Phase 1 behavior). */
+  autonomy?: boolean;
+  /** NPC config overrides, for tests. */
+  npcs?: NpcConfigOverrides;
 }
 
 export function createWorld(seed: number, options: CreateWorldOptions = {}): World {
   const rules = loadWorldRules(options.rules);
+  const npcConfig = loadNpcConfig(options.npcs);
   const rng = createRng(seed);
 
   // Always roll in the fixed order (weather, then search order), even when a
@@ -59,6 +66,9 @@ export function createWorld(seed: number, options: CreateWorldOptions = {}): Wor
     shelter: { value: rules.starting.shelter, tarpInstalled: false },
     fire: { state: "none", fuel: 0, wet: false, dryHours: 0 },
     characters,
+    autonomy: options.autonomy ?? false,
+    npcBehavior: npcConfig.behavior,
+    npcs: createNpcStates(npcConfig),
     events: [],
     nextItemId: 1,
   };
@@ -78,6 +88,7 @@ function createCharacter(id: CharacterId, rules: WorldRules): Character {
     seenLocations: [...knowledge.seenLocations],
     knownRoutes: knowledge.knownRoutes.map((pair) => [...pair]),
     action: null,
+    seenForecast: null,
   };
 }
 

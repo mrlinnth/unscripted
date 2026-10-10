@@ -16,7 +16,13 @@ export type GameEventType =
   | "item_found"
   | "collapse"
   | "death"
-  | "session_ended";
+  | "session_ended"
+  // NPC autonomy (Phase 2).
+  | "npc_decision"
+  | "plan_created"
+  | "plan_changed"
+  | "goal_done"
+  | "goal_dropped";
 
 export type JsonValue =
   | string

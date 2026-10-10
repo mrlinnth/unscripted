@@ -144,7 +144,9 @@ export const movementActions: ActionDefs = {
       const { observeForecastLocation, observeForecastHours } = world.rules.weather;
       if (character.location === observeForecastLocation) {
         const hour = hourIndex(world.minute);
-        result.forecast = world.weather.slice(hour + 1, hour + 1 + observeForecastHours);
+        const forecast = world.weather.slice(hour + 1, hour + 1 + observeForecastHours);
+        result.forecast = forecast;
+        character.seenForecast = { fromHour: hour + 1, states: [...forecast] };
       }
       return result;
     },

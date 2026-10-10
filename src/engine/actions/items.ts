@@ -3,6 +3,7 @@
 
 import { workBlockReason } from "../body";
 import { logEvent } from "../events";
+import { isNpc } from "../npc/state";
 import type { Character, Item, ItemKind, World } from "../state";
 import { weatherAt } from "../weather";
 import { workDuration } from "./duration";
@@ -142,6 +143,7 @@ export const itemActions: ActionDefs = {
     complete(world, character) {
       const kind = world.wreckageToFind.shift();
       if (kind === undefined) {
+        if (isNpc(character.id)) world.npcs[character.id].wreckageSearchedOut = true;
         return { found: null };
       }
       const item = createItem(world, kind);

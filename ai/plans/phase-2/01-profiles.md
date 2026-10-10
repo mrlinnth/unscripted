@@ -49,7 +49,7 @@ Rules for every task in this file:
 
 ---
 
-## Task 1.2: NPC State in the World
+## Task 1.2: NPC State in the World [DONE]
 
 Depends on: Task 1.1
 

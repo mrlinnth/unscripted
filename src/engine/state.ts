@@ -4,6 +4,8 @@
 import type { Action } from "./actions/types";
 import type { LocationId, RoutePair, WeatherState, WorldRules } from "./config";
 import type { GameEvent } from "./events";
+import type { NpcBehavior, NpcId } from "./npc/profiles";
+import type { NpcState } from "./npc/state";
 
 export type CharacterId = "player" | "npc1" | "npc2";
 
@@ -60,6 +62,14 @@ export interface Character {
   seenLocations: LocationId[];
   knownRoutes: RoutePair[];
   action: CurrentAction | null;
+  /** Last forecast this character saw with Observe weather (A.7), or null. */
+  seenForecast: SeenForecast | null;
+}
+
+/** `states[i]` is the weather for session hour `fromHour + i`. */
+export interface SeenForecast {
+  fromHour: number;
+  states: WeatherState[];
 }
 
 export interface World {
@@ -77,6 +87,10 @@ export interface World {
   shelter: Shelter;
   fire: SignalFire;
   characters: Record<CharacterId, Character>;
+  /** When false, NPCs act only when given actions (Phase 1 behavior). */
+  autonomy: boolean;
+  npcBehavior: NpcBehavior;
+  npcs: Record<NpcId, NpcState>;
   events: GameEvent[];
   /** Counter for new item ids, so ids are deterministic. */
   nextItemId: number;

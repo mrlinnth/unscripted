@@ -2,13 +2,33 @@
 // The world is a plain JSON object; engine functions mutate it in place.
 
 import type { WeatherState } from "./config";
+import type { NpcId } from "./npc/profiles";
+import type { NpcState } from "./npc/state";
 import type { Character, CharacterId, World } from "./state";
 import { clockAt, dayAt, isNight } from "./time";
 import { weatherAt } from "./weather";
 
 export type { WorldRules, WeatherState, LocationId } from "./config";
 export type { GameEvent, GameEventType, JsonValue } from "./events";
-export type { Character, CharacterId, Item, ItemKind, World } from "./state";
+export type { Character, CharacterId, Item, ItemKind, SeenForecast, World } from "./state";
+export type {
+  NpcBehavior,
+  NpcConfigOverrides,
+  NpcGoalId,
+  NpcId,
+  NpcIdentity,
+  NpcPriority,
+  NpcProfile,
+} from "./npc/profiles";
+export { NPC_IDS } from "./npc/profiles";
+export type {
+  DecisionRule,
+  GoalStatus,
+  NpcDecision,
+  NpcGoalState,
+  NpcPlan,
+  NpcState,
+} from "./npc/state";
 export { CHARACTER_IDS } from "./state";
 export { createWorld, type CreateWorldOptions } from "./world";
 export { step, stepMinutes } from "./step";
@@ -40,4 +60,8 @@ export function getWeather(world: World): WeatherState {
 
 export function getCharacter(world: World, id: CharacterId): Readonly<Character> {
   return world.characters[id];
+}
+
+export function getNpc(world: World, id: NpcId): Readonly<NpcState> {
+  return world.npcs[id];
 }
