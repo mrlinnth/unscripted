@@ -3,7 +3,7 @@
 import { actionJson } from "./actions/json";
 import type { ActivityKind } from "./actions/types";
 import type { WorldRules } from "./config";
-import { logEvent } from "./events";
+import { logEvent, logEventAt } from "./events";
 import { CHARACTER_IDS, type Character, type World } from "./state";
 
 export type FatigueCondition = "rested" | "tired" | "exhausted";
@@ -22,11 +22,16 @@ export function isAsleep(character: Character): boolean {
   return type === "sleep" || type === "collapse";
 }
 
-/** Protection = a natural shelter (Cave), or the camp with shelter at the threshold or more. */
-export function isProtected(world: World, character: Character): boolean {
+/** Under shelter = a natural shelter (Cave), or the camp with shelter at the threshold or more. */
+export function isShelteredLocation(world: World, location: string): boolean {
   const { shelter } = world.rules;
-  if (shelter.naturalShelters.includes(character.location)) return true;
-  return character.location === shelter.location && world.shelter.value >= shelter.protectsAt;
+  if (shelter.naturalShelters.includes(location)) return true;
+  return location === shelter.location && world.shelter.value >= shelter.protectsAt;
+}
+
+/** Protection for a character (A.9): being at a sheltered location. */
+export function isProtected(world: World, character: Character): boolean {
+  return isShelteredLocation(world, character.location);
 }
 
 /**
@@ -69,13 +74,7 @@ export function applyFatigueMinute(world: World, character: Character, kind: Act
   character.fatigue = Math.max(0, character.fatigue + fatigueDelta(world, character, kind));
   const after = fatigueCondition(character, world.rules);
   if (after !== before) {
-    // Logged at the minute the change happened (the step increments after).
-    world.events.push({
-      minute: world.minute + 1,
-      type: "fatigue_changed",
-      actor: character.id,
-      data: { from: before, to: after },
-    });
+    logEventAt(world, world.minute + 1, "fatigue_changed", { from: before, to: after }, character.id);
   }
 }
 

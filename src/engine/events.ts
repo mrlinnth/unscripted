@@ -40,12 +40,25 @@ export function logEvent(
   data: { [key: string]: JsonValue } = {},
   actor?: CharacterId,
 ): GameEvent {
+  return logEventAt(world, world.minute, type, data, actor);
+}
+
+/**
+ * Logs an event at a given minute. Per-minute effects run before the clock
+ * moves on, so a change they cause is logged at `world.minute + 1`, the
+ * minute it has happened by.
+ */
+export function logEventAt(
+  world: World,
+  minute: number,
+  type: GameEventType,
+  data: { [key: string]: JsonValue } = {},
+  actor?: CharacterId,
+): GameEvent {
   // Leave `actor` out entirely when absent, so events stay identical after a
   // JSON round trip (save and load).
   const event: GameEvent =
-    actor === undefined
-      ? { minute: world.minute, type, data }
-      : { minute: world.minute, type, actor, data };
+    actor === undefined ? { minute, type, data } : { minute, type, actor, data };
   world.events.push(event);
   return event;
 }

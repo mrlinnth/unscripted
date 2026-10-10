@@ -4,6 +4,7 @@ import type { GameEvent } from "../events";
 import { cancelAction, createWorld, gameMinuteAt, stepMinutes, submitAction } from "../index";
 import type { Character, World } from "../state";
 import { roundUpMinutes } from "./duration";
+import type { Action } from "./types";
 
 const rules = loadWorldRules();
 const at = (day: number, time: string): number => gameMinuteAt(rules, day, time);
@@ -295,11 +296,12 @@ describe("framework", () => {
     });
   });
 
-  it("rejects actions that are not built yet", () => {
+  it("rejects an unknown action type (for example from a UI bug)", () => {
     const world = setup();
-    expect(submitAction(world, "player", { type: "build_fire" })).toEqual({
+    const unknown = { type: "fly" } as unknown as Action;
+    expect(submitAction(world, "player", unknown)).toEqual({
       ok: false,
-      reason: "build_fire is not available yet",
+      reason: "unknown action: fly",
     });
   });
 

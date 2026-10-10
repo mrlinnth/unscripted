@@ -2,14 +2,17 @@
 //
 // Step order is fixed; tests and determinism rely on it:
 //   1. If the session has ended, do nothing.
-//   2. Per-minute effects for the minute that just passed (Phase 4).
+//   2. Per-minute effects for the minute that just passed: flashlight
+//      battery, fatigue, fire burn, then wet wood.
 //   3. minute += 1.
-//   4. On the hour: hourly effects for the hour that just ended (Phase 4),
-//      then log `weather_changed` if the new hour's weather differs.
-//   5. Per character, in CHARACTER_IDS order: re-check, progress, and
-//      complete actions (Phase 4).
+//   4. On the hour: hourly effects for the hour that just ended (health,
+//      shelter loss, drying), then log `weather_changed` if the new hour's
+//      weather differs.
+//   5. Per character, in CHARACTER_IDS order: re-check, complete, and
+//      collapse.
 //   6. If minute reached the session end, set `ended` and log `session_ended`.
 
+import { applyFireMinute, applyHourlyDrying, applyWetWoodMinute } from "./actions/fire";
 import { advanceActions, applyActionMinuteEffects } from "./actions/framework";
 import { applyHourlyShelterLoss } from "./actions/shelter";
 import { applyHourlyHealth } from "./body";
@@ -21,6 +24,8 @@ import { hourIndex, isOnTheHour, sessionLengthMinutes } from "./time";
 /** Step 2: per-minute effects for the minute that just passed. */
 function applyPerMinuteEffects(world: World): void {
   applyActionMinuteEffects(world);
+  applyFireMinute(world);
+  applyWetWoodMinute(world);
 }
 
 /**
@@ -30,6 +35,7 @@ function applyPerMinuteEffects(world: World): void {
 function applyHourlyEffects(world: World, endedHour: number): void {
   applyHourlyHealth(world, endedHour);
   applyHourlyShelterLoss(world, endedHour);
+  applyHourlyDrying(world, endedHour);
 }
 
 /** Step 5: actions for each character. */

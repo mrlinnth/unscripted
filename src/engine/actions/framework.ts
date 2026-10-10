@@ -8,6 +8,7 @@
 import { applyFatigueMinute, shouldCollapse } from "../body";
 import { logEvent } from "../events";
 import { CHARACTER_IDS, type Character, type CharacterId, type World } from "../state";
+import { fireActions } from "./fire";
 import { itemActions } from "./items";
 import { actionJson, type JsonObject } from "./json";
 import { drainFlashlights, movementActions } from "./movement";
@@ -37,6 +38,7 @@ const actionDefs: ActionDefs = {
   ...restActions,
   ...itemActions,
   ...shelterActions,
+  ...fireActions,
 };
 
 function defFor(type: ActionType): ActionDef<Action> | undefined {
@@ -79,7 +81,7 @@ export function submitAction(world: World, id: CharacterId, action: Action): Sub
   if (world.ended) reason = "the session has ended";
   else if (!character.alive) reason = "character is dead";
   else if (character.action) reason = `busy: ${character.action.action.type}`;
-  else if (!def) reason = `${action.type} is not available yet`;
+  else if (!def) reason = `unknown action: ${action.type}`;
   else reason = def.validate(world, character, action);
 
   if (reason !== null || !def) {

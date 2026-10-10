@@ -170,7 +170,7 @@ Depends on: Task 4.3
 
 ---
 
-## Task 4.5: Signal Fire and Wet Wood
+## Task 4.5: Signal Fire and Wet Wood [DONE]
 
 Depends on: Task 4.4
 
