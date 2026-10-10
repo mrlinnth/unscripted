@@ -62,7 +62,7 @@ typecheck script, using the versions in `ai/CONSTRAINTS.md`.
 
 ---
 
-## Task 2.2: Vitest and Engine Folder
+## Task 2.2: Vitest and Engine Folder [DONE]
 
 Depends on: Task 2.1
 

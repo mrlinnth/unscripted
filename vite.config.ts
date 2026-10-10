@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 // @ts-expect-error type error without @types/node package
@@ -28,5 +29,11 @@ export default defineConfig(() => ({
       // 3. tell Vite to ignore watching `src-tauri`
       ignored: ["**/src-tauri/**"],
     },
+  },
+
+  // Vitest: the engine is pure TypeScript and runs in plain Node.
+  test: {
+    environment: "node",
+    include: ["src/**/*.test.ts"],
   },
 }));
