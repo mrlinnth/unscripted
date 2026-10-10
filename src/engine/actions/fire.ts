@@ -77,8 +77,10 @@ function lightReason(world: World, character: Character): string | null {
     (lighter && lighter.usesLeft <= 0 ? "lighter is used up" : null) ??
     (world.fire.state === "lit" ? "fire already lit" : null) ??
     (world.fire.state !== "built" ? "no fire built" : null) ??
-    (world.fire.wet ? "fire is wet" : null) ??
-    (world.rules.signalFire.lightBlockedWeather.includes(weather) ? `cannot light in ${weather}` : null)
+    // Weather before wetness: in a Storm the fire is usually wet too, and the
+    // weather is the more direct reason.
+    (world.rules.signalFire.lightBlockedWeather.includes(weather) ? `cannot light in ${weather}` : null) ??
+    (world.fire.wet ? "fire is wet" : null)
   );
 }
 

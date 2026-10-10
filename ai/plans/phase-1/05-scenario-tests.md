@@ -64,7 +64,7 @@ Depends on: Task 5.1
 
 ---
 
-## Task 5.3: T2 Storm, T3 Fire Against Rain, T4 Exhaustion
+## Task 5.3: T2 Storm, T3 Fire Against Rain, T4 Exhaustion [DONE]
 
 Depends on: Task 5.2
 
