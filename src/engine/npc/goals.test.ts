@@ -312,8 +312,9 @@ describe("signal_rescue", () => {
     world.fire.state = "built";
     expect(signal_rescue.plan(view(world, "npc2"))).toEqual([{ type: "light_fire" }]);
 
+    // Lit is not done: she keeps the fire burning.
     world.fire.state = "lit";
-    expect(signal_rescue.isDone(view(world, "npc2"))).toBe(true);
+    expect(signal_rescue.isDone(view(world, "npc2"))).toBe(false);
   });
 
   it("does not build with wet wood, and waits for it to dry instead of hauling more", () => {
@@ -334,16 +335,62 @@ describe("signal_rescue", () => {
     expect(signal_rescue.plan(view(world, "npc2"))).toEqual([{ type: "move", to: "forest" }]);
   });
 
-  it("becomes active again when she sees the fire out", () => {
-    const world = createWorld(1);
-    world.characters.npc2.location = "hilltop";
-    expect(signal_rescue.isUndone?.(view(world, "npc2"))).toBe("fire is out");
-    world.fire.state = "lit";
-    expect(signal_rescue.isUndone?.(view(world, "npc2"))).toBeNull();
-    // Away from the Hilltop she can't see the fire.
-    world.fire.state = "none";
-    world.characters.npc2.location = "cave";
-    expect(signal_rescue.isUndone?.(view(world, "npc2"))).toBeNull();
+  describe("tending a lit fire", () => {
+    /** Sarah at the Hilltop with a lit fire of the given fuel hours (1 h = 120 units). */
+    function litFire(fuelHours: number): World {
+      const world = createWorld(1);
+      knowAll(world, "npc2");
+      place(world, "npc2", "hilltop");
+      world.fire = { state: "lit", fuel: fuelHours * 120, wet: false, dryHours: 0 };
+      return world;
+    }
+
+    it("adds carried wood while there is room, dry bundles first", () => {
+      const world = litFire(5);
+      const wet = createItem(world, "wood");
+      if (wet.kind === "wood") wet.wet = true;
+      world.characters.npc2.inventory.push(wet);
+      const dry = give(world, "npc2", "wood");
+      expect(signal_rescue.plan(view(world, "npc2"))).toEqual([
+        { type: "add_wood", itemId: dry },
+        { type: "add_wood", itemId: wet.id },
+      ]);
+    });
+
+    it("adds only as many bundles as fit under the fuel cap", () => {
+      const world = litFire(6.5);
+      const a = give(world, "npc2", "wood");
+      give(world, "npc2", "wood");
+      expect(signal_rescue.plan(view(world, "npc2"))).toEqual([{ type: "add_wood", itemId: a }]);
+    });
+
+    it("takes wood lying here and adds it", () => {
+      const world = litFire(3);
+      const wood = lay(world, "hilltop", "wood");
+      expect(signal_rescue.plan(view(world, "npc2"))).toEqual([
+        { type: "take", itemId: wood },
+        { type: "add_wood", itemId: wood },
+      ]);
+    });
+
+    it("fetches more wood when the fire is full and her hands are free", () => {
+      const world = litFire(7.5);
+      expect(signal_rescue.plan(view(world, "npc2"))).toEqual([{ type: "move", to: "forest" }]);
+    });
+
+    it("waits when the fire is full and her hands are full", () => {
+      const world = litFire(7.5);
+      give(world, "npc2", "wood");
+      give(world, "npc2", "wood");
+      expect(signal_rescue.plan(view(world, "npc2"))).toBeNull();
+    });
+
+    it("needs no lighter, and is not dropped for a missing lighter", () => {
+      const world = litFire(3);
+      world.npcs.npc2.wreckageSearchedOut = true;
+      expect(signal_rescue.isDropped(view(world, "npc2"))).toBeNull();
+      expect(signal_rescue.plan(view(world, "npc2"))).toEqual([{ type: "move", to: "forest" }]);
+    });
   });
 
   it("does not plan to light in Heavy Rain or with a wet fire", () => {

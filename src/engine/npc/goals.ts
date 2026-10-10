@@ -254,9 +254,34 @@ const keepFlashlight: GoalPlanner = {
 
 // --- signal_rescue (Sarah) -------------------------------------------------
 // Once a route to the Hilltop is known: get the lighter first, then haul dry
-// wood to the Hilltop, build, and light. Getting the lighter first means she
-// never turns back halfway between the Hilltop and the Wreckage (she can't see
-// the fire once she leaves).
+// wood to the Hilltop, build, light, and keep it burning. Getting the lighter
+// first means she never turns back halfway between the Hilltop and the
+// Wreckage (she can't see the fire once she leaves). Never done: a lit fire
+// burns out unless someone adds wood.
+
+/** Tend a lit fire: add wood while there is room under the fuel cap, else fetch more. */
+function tendSteps(view: NpcView, fuelHours: number): Action[] | null {
+  // A bundle added to a full fire is wasted, so add only while it fits.
+  const room = Math.floor((view.rules.fireMaxFuelHours - fuelHours) / view.rules.fireAddFuelHours);
+  // Dry first: wet wood still burns, but makes the fire wet, so it can't be
+  // relit after going out until it dries.
+  const wood = carried(view, "wood").sort((a, b) => Number(a.kind === "wood" && a.wet) - Number(b.kind === "wood" && b.wet));
+
+  if (room > 0 && wood.length > 0) {
+    return wood.slice(0, room).map((item): Action => ({ type: "add_wood", itemId: item.id }));
+  }
+  if (room > 0) {
+    const takes = takeAll(view, "wood").slice(0, room);
+    if (takes.length > 0) {
+      return takes.flatMap((take): Action[] =>
+        take.type === "take" ? [take, { type: "add_wood", itemId: take.itemId }] : [],
+      );
+    }
+  }
+  // Hands not full: fetch more wood while the fire burns.
+  if (roomFor(view, "wood") > 0) return orNull(movesTo(view, view.rules.gatherLocation));
+  return null;
+}
 
 function signalSteps(view: NpcView, toHilltop: Action[]): Action[] | null {
   const hilltop = view.rules.fireLocation;
@@ -264,7 +289,7 @@ function signalSteps(view: NpcView, toHilltop: Action[]): Action[] | null {
 
   if (at(view, hilltop) && view.here.fire) {
     const fire = view.here.fire;
-    if (fire.state === "lit") return null;
+    if (fire.state === "lit") return tendSteps(view, fire.fuelHours);
     if (fire.state === "built") {
       if (fire.wet || view.rules.lightBlockedWeather.includes(view.weather.current)) return null;
       return [{ type: "light_fire" }];
@@ -292,20 +317,22 @@ function signalSteps(view: NpcView, toHilltop: Action[]): Action[] | null {
 }
 
 const signalRescue: GoalPlanner = {
-  isDone(view) {
-    return view.here.fire?.state === "lit";
+  isDone() {
+    return false;
   },
   isDropped(view) {
+    // Once a fire is lit she can tend it without the lighter.
+    if (view.here.fire?.state === "lit") return null;
     return lostAtWreckage(view, "lighter") ? "lighter not found at the Wreckage" : null;
-  },
-  isUndone(view) {
-    const fire = view.here.fire;
-    return fire !== null && fire.state !== "lit" ? `fire is ${fire.state === "none" ? "out" : "not lit"}` : null;
   },
   plan(view) {
     const toHilltop = movesTo(view, view.rules.fireLocation);
     if (toHilltop === null) return null;
 
+    // A lit fire needs no lighter, only wood.
+    if (at(view, view.rules.fireLocation) && view.here.fire?.state === "lit") {
+      return signalSteps(view, toHilltop);
+    }
     if (carried(view, "lighter").length === 0) {
       // Take a lighter whenever she sees one; otherwise fetch it first.
       const takeLighter = takeAll(view, "lighter").slice(0, 1);

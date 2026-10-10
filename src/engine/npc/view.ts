@@ -76,6 +76,8 @@ export interface NpcView {
     naturalShelters: LocationId[];
     fireLocation: LocationId;
     fireBuildWood: number;
+    fireMaxFuelHours: number;
+    fireAddFuelHours: number;
     wreckageLocation: LocationId;
     gatherLocation: LocationId;
     forecastLocation: LocationId;
@@ -168,6 +170,8 @@ export function buildNpcView(world: World, id: NpcId): NpcView {
       naturalShelters: rules.shelter.naturalShelters,
       fireLocation: rules.signalFire.location,
       fireBuildWood: rules.signalFire.buildWood,
+      fireMaxFuelHours: rules.signalFire.maxFuelHours,
+      fireAddFuelHours: rules.signalFire.addFuelHours,
       wreckageLocation: rules.wreckage.location,
       gatherLocation: requiredLocation(rules.actions.gather_wood.location, "actions.gather_wood.location"),
       forecastLocation: rules.weather.observeForecastLocation,

@@ -89,6 +89,14 @@ describe.each(SEEDS)("full session, no player input, seed %i", (seed) => {
   });
 });
 
+describe("seed 11 (clear and cloudy only)", () => {
+  it("has Sarah tend the fire so it is still burning at Day 3 08:00", () => {
+    const world = runSession(11);
+    expect(world.fire.state).toBe("lit");
+    expect(completedOf(world, "npc2", "add_wood")).toBeGreaterThanOrEqual(1);
+  });
+});
+
 describe("seed 1 (Storms on Day 2 night)", () => {
   it("has no NPC turn back and forth until it collapses", () => {
     // Regression: Sarah used to bounce between Beach Camp (seen unprotected)

@@ -75,8 +75,11 @@ the developer accepted for building. The developer approves them in the spec.
      and light it. Lighter first, because she can't see the fire once she
      leaves the Hilltop, so fetching it mid-way would make her turn back.
      Once enough wood lies at the Hilltop but some is wet, she waits for it
-     to dry instead of hauling more. Becomes active again when she sees the
-     fire is not lit.
+     to dry instead of hauling more. Never done: once the fire is lit she
+     tends it. She adds wood while it fits under the fuel cap (dry bundles
+     first, so the fire stays dry), and fetches more from the Forest while
+     her hands are free. A lit fire needs no lighter, so the goal is not
+     dropped for a missing one. If she finds the fire out, she rebuilds it.
 - Starting trust: Marcus 50, player 50.
 
 ## 2. Goals and Plans
@@ -87,8 +90,8 @@ the developer accepted for building. The developer approves them in the spec.
   Forest → Gather wood → Move to Beach Camp → Repair shelter.
 - A goal is done when its check passes. A done goal becomes active again
   (logged as `goal_reopened`) only when the NPC can see it is no longer met:
-  Marcus at camp with the shelter below 80, Sarah at the Hilltop with the
-  fire not lit. Other goals stay done.
+  Marcus at camp with the shelter below 80. Other goals stay done.
+  `keep_wood_reserve` and `signal_rescue` are never done.
 - A goal is dropped when it becomes impossible. Example: the Wreckage has
   nothing left and the tarp was never found. Dropping is logged.
 - Plans use only what the NPC is allowed to read (section 4). Example: Sarah
