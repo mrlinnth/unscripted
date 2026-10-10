@@ -69,8 +69,10 @@ the developer accepted for building. The developer approves them in the spec.
   2. **Keep the flashlight** (medium). Search the Wreckage until the
      flashlight is found, then take it and keep it.
   3. **Signal for rescue** (low). Once she knows a route to the Hilltop:
-     gather wood, carry it to the Hilltop, build the fire, and light it. She
-     takes the lighter if she sees it.
+     get the lighter first (take it if she sees it, else search the
+     Wreckage), then gather wood, carry it to the Hilltop, build the fire,
+     and light it. Lighter first, because she can't see the fire once she
+     leaves the Hilltop, so fetching it mid-way would make her turn back.
 - Starting trust: Marcus 50, player 50.
 
 ## 2. Goals and Plans
