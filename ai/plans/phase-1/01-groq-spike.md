@@ -16,7 +16,7 @@ Facts checked in Groq docs on 2026-10-10 (re-check if anything fails):
 - gpt-oss request options: `reasoning_effort` (`low` / `medium` / `high`),
   `include_reasoning` (default true), `max_completion_tokens` (default 1024).
 
-## Task 1.1: Spike Setup and First Call
+## Task 1.1: Spike Setup and First Call [DONE]
 
 ### Subtasks
 - Create a standalone Cargo binary project in `spikes/groq/` (its own
