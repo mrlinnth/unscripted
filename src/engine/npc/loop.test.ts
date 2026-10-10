@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { createWorld, stepMinutes, submitAction, type GameEvent, type World } from "../index";
 import { weatherPlan } from "../scenarios/harness";
-import { sessionLengthMinutes } from "../time";
+import { loadWorldRules } from "../config";
+import { gameMinuteAt, sessionLengthMinutes } from "../time";
 
 function eventsOf(world: World, actor: string, type?: string): GameEvent[] {
   return world.events.filter((e) => e.actor === actor && (type === undefined || e.type === type));
@@ -132,6 +133,26 @@ describe("autonomy on", () => {
     expect(world.characters.npc1.action?.action.type).toBe("sleep");
     expect(eventsOf(world, "npc1", "npc_decision")).toHaveLength(decisions);
     expect(eventsOf(world, "npc1", "action_cancelled")).toEqual([]);
+  });
+
+  it("lets night Tiredness wait until the running action ends", () => {
+    // Regression: Sarah's fire build was cut off 23 minutes early when she
+    // became Tired at night, and rain then soaked the wood.
+    const night = gameMinuteAt(loadWorldRules(), 1, "23:00");
+    const world = createWorld(1, { weather: weatherPlan([]) });
+    stepMinutes(world, night);
+    world.characters.npc2.location = "forest";
+    world.characters.npc2.fatigue = world.rules.fatigue.tiredAt * 2 - 20; // Tired in 10 minutes
+    expect(submitAction(world, "npc2", { type: "gather_wood" })).toEqual({ ok: true });
+    world.npcs.npc2.lastReviewAt = night;
+    world.autonomy = true;
+
+    stepMinutes(world, 20);
+    expect(eventsOf(world, "npc2", "action_cancelled")).toEqual([]);
+    expect(world.characters.npc2.action?.action.type).toBe("gather_wood");
+    stepMinutes(world, 15);
+    const decision = eventsOf(world, "npc2", "npc_decision")[0];
+    expect(decision?.data).toMatchObject({ rule: "a" });
   });
 
   it("falls through to the next rule when a choice is rejected, without looping", () => {

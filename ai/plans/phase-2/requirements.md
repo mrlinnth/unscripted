@@ -48,7 +48,8 @@ the developer accepted for building. The developer approves them in the spec.
 - Goals:
   1. **Make Beach Camp safe** (high). Find the tarp at the Wreckage, install
      it, then repair the shelter to 80 or more. Competes with the signal fire
-     for wood and Wreckage searches.
+     for wood and Wreckage searches. Becomes active again when he sees the
+     shelter below 80. Repairs use a bundle lying at camp first, if any.
   2. **Keep wood in reserve** (low). After goal 1 is done, keep 1 dry wood
      bundle at Beach Camp.
 - Starting trust: Sarah 40, player 40.
@@ -73,6 +74,9 @@ the developer accepted for building. The developer approves them in the spec.
      Wreckage), then gather wood, carry it to the Hilltop, build the fire,
      and light it. Lighter first, because she can't see the fire once she
      leaves the Hilltop, so fetching it mid-way would make her turn back.
+     Once enough wood lies at the Hilltop but some is wet, she waits for it
+     to dry instead of hauling more. Becomes active again when she sees the
+     fire is not lit.
 - Starting trust: Marcus 50, player 50.
 
 ## 2. Goals and Plans
@@ -81,7 +85,10 @@ the developer accepted for building. The developer approves them in the spec.
   that builds a plan for it.
 - A plan is an ordered list of actions from the A.12 table. Example: Move to
   Forest → Gather wood → Move to Beach Camp → Repair shelter.
-- A goal is done when its check passes. A done goal is never planned again.
+- A goal is done when its check passes. A done goal becomes active again
+  (logged as `goal_reopened`) only when the NPC can see it is no longer met:
+  Marcus at camp with the shelter below 80, Sarah at the Hilltop with the
+  fire not lit. Other goals stay done.
 - A goal is dropped when it becomes impossible. Example: the Wreckage has
   nothing left and the tarp was never found. Dropping is logged.
 - Plans use only what the NPC is allowed to read (section 4). Example: Sarah
@@ -94,7 +101,9 @@ the developer accepted for building. The developer approves them in the spec.
 An NPC chooses its next action only at a decision point:
 
 - Its current action completes, is rejected, or is interrupted.
-- An urgent need starts (rules a–c below become true).
+- An urgent need starts (rules a–c below become true). Night and Tired
+  (part of rule a) is not urgent: it waits for the current action to end,
+  so it doesn't cut off work in progress. Exhausted is urgent.
 - 3 in-game hours have passed since its last plan review (§3.5).
 
 Between decision points it keeps doing its current action. A collapsed or
@@ -109,7 +118,8 @@ dead NPC makes no decisions.
 - **c.** Health below 50 → go to the nearest known protected place and sleep.
 - **d.** Otherwise → the next step of the plan for the highest-priority goal
   that is not done or dropped. If there is no plan, or the next step is
-  blocked, build a new plan.
+  blocked, build a new plan. In Heavy Rain or Storm, a protected NPC skips
+  plan steps that would move it out (rule b would bring it straight back).
 - **e.** Nothing left to do → wait 30 minutes.
 
 "Protected" means the Cave, or Beach Camp with shelter at 30 or more (A.9).

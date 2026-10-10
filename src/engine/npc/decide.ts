@@ -13,7 +13,8 @@ import { isProtectedFor, nearestProtected, pathTo, type NpcView } from "./view";
 
 export interface GoalChange {
   id: NpcGoalId;
-  status: Exclude<GoalStatus, "active">;
+  /** "active" means a done goal is active again. */
+  status: GoalStatus;
   reason: string;
 }
 
@@ -45,12 +46,20 @@ function excluded(action: Action, exclude: Action[]): boolean {
   return exclude.some((other) => sameAction(action, other));
 }
 
-/** Goal done/dropped checks for active goals, in config order. */
+/**
+ * Goal status checks, in config order: active goals may become done or
+ * dropped; done goals may become active again. Dropped goals stay dropped.
+ */
 function goalChanges(view: NpcView): GoalChange[] {
   const changes: GoalChange[] = [];
   for (const goal of view.npc.goals) {
-    if (goal.status !== "active") continue;
     const planner = goalPlanners[goal.id];
+    if (goal.status === "done") {
+      const undone = planner.isUndone?.(view) ?? null;
+      if (undone !== null) changes.push({ id: goal.id, status: "active", reason: undone });
+      continue;
+    }
+    if (goal.status !== "active") continue;
     const dropped = planner.isDropped(view);
     if (dropped !== null) {
       changes.push({ id: goal.id, status: "dropped", reason: dropped });
@@ -97,10 +106,15 @@ function planStep(
   exclude: Action[],
 ): { action: Action; plan: NpcPlan; planEvent: NpcChoice["planEvent"] } | null {
   const current = view.npc.plan;
+  // In cover weather, a protected NPC doesn't leave for a plan step; rule b
+  // would only bring it straight back.
+  const stayPut =
+    view.behavior.coverWeather.includes(view.weather.current) && isProtectedFor(view, view.self.location);
   for (const goalId of activeGoals) {
     const steps = goalPlanners[goalId].plan(view);
     const first = steps?.[0];
     if (!steps || !first || excluded(first, exclude)) continue;
+    if (stayPut && first.type === "move") continue;
 
     // Keep the current plan if the new steps are what is left of it.
     if (current && current.goalId === goalId) {
@@ -134,9 +148,20 @@ function hasLowHealth(view: NpcView): boolean {
   return view.self.health < view.behavior.lowHealth;
 }
 
-/** The first urgent rule (a–c) whose condition is true now, or null. */
+/**
+ * True when rule a applies only because it is night and the NPC is Tired.
+ * That can wait for the current action to end; Exhausted can't.
+ */
+export function isSoftRest(view: NpcView): boolean {
+  return needsRest(view) && view.self.fatigue !== "exhausted";
+}
+
+/**
+ * The first urgent rule (a–c) whose condition is true now, or null. Night and
+ * Tired is not urgent: it would cut off work in progress (a fire nearly built).
+ */
 export function urgentRule(view: NpcView): DecisionRule | null {
-  if (needsRest(view)) return "a";
+  if (view.self.fatigue === "exhausted") return "a";
   if (needsCover(view)) return "b";
   if (hasLowHealth(view)) return "c";
   return null;
@@ -144,10 +169,11 @@ export function urgentRule(view: NpcView): DecisionRule | null {
 
 export function decide(view: NpcView, rng: Rng, exclude: Action[] = []): NpcChoice {
   const changes = goalChanges(view);
-  const changed = new Set(changes.map((c) => c.id));
+  const statusAfter = (goal: { id: NpcGoalId; status: GoalStatus }): GoalStatus =>
+    changes.find((c) => c.id === goal.id)?.status ?? goal.status;
   const activeGoals = view.npc.goals
     .map((goal, order) => ({ goal, order }))
-    .filter(({ goal }) => goal.status === "active" && !changed.has(goal.id))
+    .filter(({ goal }) => statusAfter(goal) === "active")
     .sort((a, b) => PRIORITY_ORDER[a.goal.priority] - PRIORITY_ORDER[b.goal.priority] || a.order - b.order)
     .map(({ goal }) => goal.id);
 

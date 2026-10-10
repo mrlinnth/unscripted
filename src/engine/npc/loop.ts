@@ -8,7 +8,7 @@ import { actionJson } from "../actions/json";
 import type { Action } from "../actions/types";
 import { logEvent } from "../events";
 import type { World } from "../state";
-import { decide, sameAction, urgentRule, type NpcChoice } from "./decide";
+import { decide, isSoftRest, sameAction, urgentRule, type NpcChoice } from "./decide";
 import { NPC_IDS, type NpcId } from "./profiles";
 import { buildNpcView } from "./view";
 
@@ -43,10 +43,12 @@ function decideFor(world: World, id: NpcId, rng: { state: number }): void {
 
   const exclude: Action[] = [];
   for (let tries = 0; tries < MAX_TRIES; tries++) {
-    const choice = decide(buildNpcView(world, id), rng, exclude);
+    const view = buildNpcView(world, id);
+    const choice = decide(view, rng, exclude);
     const running = character.action?.action;
 
-    if (running && servesChoice(running, choice)) {
+    // Night Tiredness waits for the running action to end (see isSoftRest).
+    if (running && (servesChoice(running, choice) || (choice.rule === "a" && isSoftRest(view)))) {
       // Keep doing it. Save goal and plan changes, but log no decision.
       applyChoice(world, id, choice, false);
       return;
@@ -76,7 +78,8 @@ function applyChoice(world: World, id: NpcId, choice: NpcChoice, logDecision: bo
     const goal = npc.goals.find((g) => g.id === change.id);
     if (!goal) continue;
     goal.status = change.status;
-    logEvent(world, change.status === "done" ? "goal_done" : "goal_dropped", { goal: change.id, reason: change.reason }, id);
+    const type = change.status === "done" ? "goal_done" : change.status === "dropped" ? "goal_dropped" : "goal_reopened";
+    logEvent(world, type, { goal: change.id, reason: change.reason }, id);
   }
 
   if (choice.planEvent !== null && choice.plan !== null) {

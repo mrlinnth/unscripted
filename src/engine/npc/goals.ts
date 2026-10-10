@@ -17,6 +17,12 @@ export interface GoalPlanner {
   isDone(view: NpcView): boolean;
   /** Reason the goal can no longer be reached, or null. */
   isDropped(view: NpcView): string | null;
+  /**
+   * For a done goal: a reason when the NPC can clearly see it is no longer
+   * met, so it becomes active again; else null. Leave out for goals that stay
+   * done (an NPC can't forget a route).
+   */
+  isUndone?(view: NpcView): string | null;
   /** Steps toward the goal from here, or null if no step is possible now. */
   plan(view: NpcView): Action[] | null;
 }
@@ -124,6 +130,12 @@ const makeCampSafe: GoalPlanner = {
   isDropped() {
     return null;
   },
+  isUndone(view) {
+    const shelter = view.here.shelter;
+    return shelter !== null && shelter.value < view.behavior.shelterTarget
+      ? `shelter down to ${shelter.value}`
+      : null;
+  },
   plan(view) {
     const camp = view.rules.shelterLocation;
     const tarps = carried(view, "tarp");
@@ -137,6 +149,9 @@ const makeCampSafe: GoalPlanner = {
       if (!canWork(view)) return null;
       const wood = carried(view, "wood");
       if (wood.length > 0) return [{ type: "repair_shelter" }];
+      // Use a bundle lying at camp (the wood reserve) before walking to the Forest.
+      const take = takeAll(view, "wood").slice(0, 1);
+      if (take.length > 0) return [...take, { type: "repair_shelter" }];
       return orNull(movesTo(view, view.rules.gatherLocation));
     }
 
@@ -260,6 +275,10 @@ function signalSteps(view: NpcView, toHilltop: Action[]): Action[] | null {
     }
     const drops = wood.map((item): Action => ({ type: "drop", itemId: item.id }));
     if (drops.length > 0) return drops;
+    // Enough wood here, but some is wet: wait for it to dry rather than haul
+    // more that the rain would soak too.
+    const woodHere = view.here.items.filter((item) => item.kind === "wood").length;
+    if (woodHere >= view.rules.fireBuildWood) return null;
     return orNull(movesTo(view, view.rules.gatherLocation));
   }
 
@@ -278,6 +297,10 @@ const signalRescue: GoalPlanner = {
   },
   isDropped(view) {
     return lostAtWreckage(view, "lighter") ? "lighter not found at the Wreckage" : null;
+  },
+  isUndone(view) {
+    const fire = view.here.fire;
+    return fire !== null && fire.state !== "lit" ? `fire is ${fire.state === "none" ? "out" : "not lit"}` : null;
   },
   plan(view) {
     const toHilltop = movesTo(view, view.rules.fireLocation);

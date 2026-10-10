@@ -109,6 +109,7 @@ export function eventSummary(event: GameEvent): string {
     }
     case "goal_done":
     case "goal_dropped":
+    case "goal_reopened":
       return `${short(d.goal)} (${short(d.reason)})`;
     default:
       return short(d);
@@ -135,6 +136,8 @@ export function eventColor(event: GameEvent): string | undefined {
       return "green";
     case "goal_dropped":
       return "orange";
+    case "goal_reopened":
+      return "grape";
     default:
       return undefined;
   }

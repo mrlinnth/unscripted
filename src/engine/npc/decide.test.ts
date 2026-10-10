@@ -56,7 +56,8 @@ describe("rule a: rest when Exhausted, or at night when Tired", () => {
   });
 
   it("applies at night when Tired, but not at night when Rested or by day when Tired", () => {
-    const world = createWorld(1);
+    // Clear all day, so rule b and the stay-in-cover rule don't interfere.
+    const world = createWorld(1, { weather: weatherPlan([]) });
     setFatigue(world, "npc1", "tired");
     expect(decideFor(world, "npc1").rule).toBe("d");
 
@@ -268,6 +269,23 @@ describe("rule d: follow the plan", () => {
     expect(choice.rule).toBe("e");
   });
 
+  it("makes a done goal active again and follows it", () => {
+    const world = createWorld(1);
+    world.npcs.npc1.goals[0]!.status = "done";
+    world.shelter.tarpInstalled = true;
+    world.shelter.value = 60;
+    expect(decideFor(world, "npc1")).toMatchObject({
+      goalChanges: [{ id: "make_camp_safe", status: "active", reason: "shelter down to 60" }],
+      reason: "make_camp_safe step 1: move",
+    });
+  });
+
+  it("keeps a protected NPC in place in bad weather instead of leaving for a plan step", () => {
+    const world = createWorld(1, { weather: weatherPlan([], "heavy_rain") });
+    // At Beach Camp (shelter 40, protected), make_camp_safe would walk to the Wreckage.
+    expect(decideFor(world, "npc1")).toMatchObject({ rule: "e", action: { type: "wait" } });
+  });
+
   it("tries a lower goal when the top goal has no plan right now", () => {
     const world = createWorld(1);
     // Sarah: map_island done; keep_flashlight goes to the Wreckage.
@@ -281,6 +299,9 @@ describe("rule e: wait", () => {
   it("waits when no goal has a plan", () => {
     const world = createWorld(1);
     world.npcs.npc1.goals[0]!.status = "done";
+    // Shelter at the target, so make_camp_safe stays done.
+    world.shelter.value = 80;
+    world.shelter.tarpInstalled = true;
     const wood = createItem(world, "wood");
     world.locations.beach_camp!.items.push(wood);
     expect(decideFor(world, "npc1")).toMatchObject({

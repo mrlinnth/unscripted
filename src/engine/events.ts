@@ -22,7 +22,8 @@ export type GameEventType =
   | "plan_created"
   | "plan_changed"
   | "goal_done"
-  | "goal_dropped";
+  | "goal_dropped"
+  | "goal_reopened";
 
 export type JsonValue =
   | string

@@ -119,6 +119,29 @@ describe("make_camp_safe", () => {
     expect(make_camp_safe.isDone(view(world, "npc1"))).toBe(true);
   });
 
+  it("becomes active again when he sees the shelter below the target", () => {
+    const world = createWorld(1);
+    world.shelter.value = 79;
+    expect(make_camp_safe.isUndone?.(view(world, "npc1"))).toBe("shelter down to 79");
+    world.shelter.value = 80;
+    expect(make_camp_safe.isUndone?.(view(world, "npc1"))).toBeNull();
+    // Away from camp he can't see it.
+    world.shelter.value = 10;
+    place(world, "npc1", "forest");
+    expect(make_camp_safe.isUndone?.(view(world, "npc1"))).toBeNull();
+  });
+
+  it("repairs with a bundle lying at camp before walking to the Forest", () => {
+    const world = createWorld(1);
+    world.shelter.tarpInstalled = true;
+    world.shelter.value = 50;
+    const wood = lay(world, "beach_camp", "wood");
+    expect(make_camp_safe.plan(view(world, "npc1"))).toEqual([
+      { type: "take", itemId: wood },
+      { type: "repair_shelter" },
+    ]);
+  });
+
   it("plans no work while Exhausted", () => {
     const world = createWorld(1);
     place(world, "npc1", "forest");
@@ -293,13 +316,34 @@ describe("signal_rescue", () => {
     expect(signal_rescue.isDone(view(world, "npc2"))).toBe(true);
   });
 
-  it("does not count wet wood toward building", () => {
+  it("does not build with wet wood, and waits for it to dry instead of hauling more", () => {
     const world = createWorld(1);
     knowAll(world, "npc2");
     give(world, "npc2", "lighter");
     place(world, "npc2", "hilltop");
     for (let i = 0; i < world.rules.signalFire.buildWood; i++) lay(world, "hilltop", "wood", true);
+    expect(signal_rescue.plan(view(world, "npc2"))).toBeNull();
+  });
+
+  it("keeps hauling while there is not enough wood here, wet or dry", () => {
+    const world = createWorld(1);
+    knowAll(world, "npc2");
+    give(world, "npc2", "lighter");
+    place(world, "npc2", "hilltop");
+    for (let i = 0; i < world.rules.signalFire.buildWood - 1; i++) lay(world, "hilltop", "wood", true);
     expect(signal_rescue.plan(view(world, "npc2"))).toEqual([{ type: "move", to: "forest" }]);
+  });
+
+  it("becomes active again when she sees the fire out", () => {
+    const world = createWorld(1);
+    world.characters.npc2.location = "hilltop";
+    expect(signal_rescue.isUndone?.(view(world, "npc2"))).toBe("fire is out");
+    world.fire.state = "lit";
+    expect(signal_rescue.isUndone?.(view(world, "npc2"))).toBeNull();
+    // Away from the Hilltop she can't see the fire.
+    world.fire.state = "none";
+    world.characters.npc2.location = "cave";
+    expect(signal_rescue.isUndone?.(view(world, "npc2"))).toBeNull();
   });
 
   it("does not plan to light in Heavy Rain or with a wet fire", () => {
