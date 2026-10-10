@@ -64,7 +64,12 @@ clock at 1× (developer checks by eye).
 
 ---
 
-## Task 6.3: Action Controls and Manual T1
+## Task 6.3: Action Controls and Manual T1 [DONE]
+
+Result (2026-10-10): the developer played seed 3489026186 by hand. The
+controls worked, but the fire could not be lit: rain from Day 1 16:00 to
+Day 2 20:00 kept the wood wet, and every rejection was correct. Accepted as
+done by the developer.
 
 Depends on: Task 6.2
 
