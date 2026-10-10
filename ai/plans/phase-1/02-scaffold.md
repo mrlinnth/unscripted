@@ -3,7 +3,7 @@
 Goal: an empty Tauri v2 + React + TypeScript + Mantine app with Vitest and a
 typecheck script, using the versions in `ai/CONSTRAINTS.md`.
 
-## Task 2.1: Tauri App at Repo Root
+## Task 2.1: Tauri App at Repo Root [DONE]
 
 ### Subtasks
 - Scaffold in the scratchpad or a temp folder, not in the repo:
