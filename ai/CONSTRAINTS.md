@@ -34,13 +34,14 @@ months old.
 | Package / Framework | Version | Notes |
 |---|---|---|
 | Rust | 1.99 stable | |
-| Node.js | 24 LTS (Krypton) | |
+| Node.js | 24 LTS (Krypton) | Target. 22.12+ also works (the VPS runs 22.13; accepted by the developer) |
 | tauri (crate) | 2.12 | v2 since Oct 2024 |
 | tauri-build (crate) | 2.7 | |
 | @tauri-apps/api | 2.12 | |
 | @tauri-apps/cli | 2.12 | |
 | create-tauri-app | 4.7 | Scaffold only |
 | react, react-dom | 19.3 | |
+| @types/react, @types/react-dom | 19.3 | Dev only. Type definitions for React; came with the Tauri template |
 | typescript | 7.0 | Released Jul 8 2026. Native port, same type checking as 6.0 |
 | @mantine/core, @mantine/hooks | 9.7 | Peer: react ^19.2 |
 | vite | 8.3 | |
