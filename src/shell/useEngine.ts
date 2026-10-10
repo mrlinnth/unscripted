@@ -23,11 +23,12 @@ export interface EngineHandle {
   submit: (action: Action) => SubmitResult;
   cancel: () => SubmitResult;
   skipToActionEnd: () => void;
-  newSession: () => void;
+  /** Starts a new session with a new seed. `autonomy`: NPCs act on their own. */
+  newSession: (autonomy: boolean) => void;
 }
 
 export function useEngine(): EngineHandle {
-  const [world, setWorld] = useState<World>(() => createWorld(newSeed()));
+  const [world, setWorld] = useState<World>(() => createWorld(newSeed(), { autonomy: true }));
   const [version, setVersion] = useState(0);
   const [speed, setSpeed] = useState<Speed>(0);
   const bump = useCallback(() => setVersion((v) => v + 1), []);
@@ -68,11 +69,14 @@ export function useEngine(): EngineHandle {
     if (skipToActionEnd(world) > 0) bump();
   }, [world, bump]);
 
-  const newSession = useCallback(() => {
-    setSpeed(0);
-    setWorld(createWorld(newSeed()));
-    bump();
-  }, [bump]);
+  const newSession = useCallback(
+    (autonomy: boolean) => {
+      setSpeed(0);
+      setWorld(createWorld(newSeed(), { autonomy }));
+      bump();
+    },
+    [bump],
+  );
 
   return { world, version, speed, setSpeed, submit, cancel, skipToActionEnd: skip, newSession };
 }

@@ -27,6 +27,9 @@ export function WorldHeader({ world, speed }: { world: World; speed: Speed }) {
       <Text size="sm" c="dimmed">
         seed {world.seed}
       </Text>
+      <Badge variant="dot" color={world.autonomy ? "green" : "gray"}>
+        {world.autonomy ? "autonomy on" : "autonomy off"}
+      </Badge>
     </Group>
   );
 }

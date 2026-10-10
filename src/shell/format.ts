@@ -5,6 +5,7 @@ import {
   dayAt,
   fatigueCondition,
   isAsleep,
+  type Action,
   type Character,
   type GameEvent,
   type Item,
@@ -46,11 +47,16 @@ export function itemLabel(item: Item): string {
 export function actionLabel(world: World, character: Character): string {
   const current = character.action;
   if (!current) return "—";
-  const { type, ...params } = current.action as { type: string } & Record<string, unknown>;
-  const detail = Object.values(params).filter((v) => v !== undefined).join(", ");
-  const name = detail ? `${type} → ${detail}` : type;
+  const name = stepLabel(current.action);
   if (current.endsAt === null) return `${name}, until done`;
   return `${name}, ${current.endsAt - world.minute} min left`;
+}
+
+/** "move → wreckage", "take → tarp-3", "search": one plan step. */
+export function stepLabel(action: Action): string {
+  const { type, ...params } = action as { type: string } & Record<string, unknown>;
+  const detail = Object.values(params).filter((v) => v !== undefined).join(", ");
+  return detail ? `${type} → ${detail}` : type;
 }
 
 /** Wood at a location: dry and wet counts. */
@@ -94,6 +100,16 @@ export function eventSummary(event: GameEvent): string {
       return `${short(d.from)} → ${short(d.to)}`;
     case "fire_changed":
       return `${short(d.from)} → ${short(d.to)}, ${Number(d.fuelHours).toFixed(2)} h${d.reason ? ` (${short(d.reason)})` : ""}`;
+    case "npc_decision":
+      return `${short(d.rule)}: ${short(d.reason)}`;
+    case "plan_created":
+    case "plan_changed": {
+      const steps = Array.isArray(d.steps) ? d.steps.map(short).join(" → ") : "";
+      return `${short(d.goal)}: ${steps}`;
+    }
+    case "goal_done":
+    case "goal_dropped":
+      return `${short(d.goal)} (${short(d.reason)})`;
     default:
       return short(d);
   }
@@ -113,6 +129,12 @@ export function eventColor(event: GameEvent): string | undefined {
     case "discovery":
     case "item_found":
       return "teal";
+    case "npc_decision":
+      return "blue";
+    case "goal_done":
+      return "green";
+    case "goal_dropped":
+      return "orange";
     default:
       return undefined;
   }

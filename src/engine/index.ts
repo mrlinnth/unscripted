@@ -20,7 +20,7 @@ export type {
   NpcPriority,
   NpcProfile,
 } from "./npc/profiles";
-export { NPC_IDS } from "./npc/profiles";
+export { NPC_IDS, loadNpcConfig } from "./npc/profiles";
 export type {
   DecisionRule,
   GoalStatus,

@@ -1,6 +1,7 @@
 import { Container, Grid, Stack, Title } from "@mantine/core";
 import { Controls } from "./shell/Controls";
 import { EventLog } from "./shell/EventLog";
+import { NpcPanel } from "./shell/NpcPanel";
 import { useEngine } from "./shell/useEngine";
 import { WorldHeader, WorldView } from "./shell/WorldView";
 
@@ -17,6 +18,7 @@ function App() {
           <Grid.Col span={{ base: 12, lg: 7 }}>
             <Stack gap="md">
               <Controls engine={engine} />
+              <NpcPanel world={world} />
               <WorldView world={world} />
             </Stack>
           </Grid.Col>

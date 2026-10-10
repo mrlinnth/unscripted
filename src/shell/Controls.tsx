@@ -1,7 +1,7 @@
 // Player controls for the dev shell. Every action is always shown; the engine
 // decides validity, and rejections appear in the result line and event log.
 
-import { Button, Group, NumberInput, Paper, SegmentedControl, Select, Stack, Text } from "@mantine/core";
+import { Button, Group, NumberInput, Paper, SegmentedControl, Select, Stack, Switch, Text } from "@mantine/core";
 import { useState } from "react";
 import type { Action, CharacterId, SubmitResult, World } from "../engine";
 import { itemLabel } from "./format";
@@ -38,6 +38,8 @@ export function Controls({ engine }: { engine: EngineHandle }) {
   const [target, setTarget] = useState<string | null>("npc1");
   const [minutes, setMinutes] = useState<number>(60);
   const [last, setLast] = useState<{ label: string; result: SubmitResult } | null>(null);
+  // Applies when starting a new session; the current one keeps its setting.
+  const [autonomyNext, setAutonomyNext] = useState<boolean>(world.autonomy);
 
   const locations = world.rules.locations.map(({ id, name }) => ({ value: id, label: name }));
   const items = itemChoices(world);
@@ -88,9 +90,14 @@ export function Controls({ engine }: { engine: EngineHandle }) {
           <Button variant="light" color="orange" onClick={() => setLast({ label: "Cancel", result: engine.cancel() })}>
             Cancel
           </Button>
-          <Button variant="subtle" color="gray" onClick={engine.newSession}>
+          <Button variant="subtle" color="gray" onClick={() => engine.newSession(autonomyNext)}>
             New session
           </Button>
+          <Switch
+            label="NPC autonomy (new session)"
+            checked={autonomyNext}
+            onChange={(event) => setAutonomyNext(event.currentTarget.checked)}
+          />
         </Group>
 
         <Group gap="xs" grow>

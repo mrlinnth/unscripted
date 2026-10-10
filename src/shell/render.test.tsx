@@ -10,7 +10,8 @@ import { createWorld, stepMinutes, submitAction } from "../engine";
 import { createItem } from "../engine/actions/items";
 import { itemChoices } from "./Controls";
 import { EventLog } from "./EventLog";
-import { WorldView } from "./WorldView";
+import { NpcPanel } from "./NpcPanel";
+import { WorldHeader, WorldView } from "./WorldView";
 
 describe("dev shell render", () => {
   it("renders the app at session start", () => {
@@ -23,6 +24,9 @@ describe("dev shell render", () => {
     expect(html).toContain("Day <!-- -->1<!-- --> <!-- -->08:00");
     expect(html).toContain("paused");
     expect(html).toContain("Beach Camp");
+    expect(html).toContain("autonomy on");
+    expect(html).toContain("Marcus Hale");
+    expect(html).toContain("NPC autonomy (new session)");
     for (const label of ["Move", "Gather wood", "Build fire", "Light fire", "Sleep until rested", "Skip to end of action"]) {
       expect(html).toContain(label);
     }
@@ -57,5 +61,35 @@ describe("dev shell render", () => {
     expect(html).toContain("action_rejected");
     expect(html).toContain("no known route from beach_camp to hilltop");
     expect(html).toContain(">2.50<"); // 300 units = 2.5 fuel-hours
+  });
+
+  it("renders the NPC panel with autonomy on: names, goals, plan, and last decision", () => {
+    const world = createWorld(1, { autonomy: true });
+    const html = renderToString(
+      <MantineProvider>
+        <NpcPanel world={world} />
+      </MantineProvider>,
+    );
+    expect(html).toContain("Marcus Hale");
+    expect(html).toContain("Sarah Okafor");
+    expect(html).toContain("make_camp_safe");
+    expect(html).toContain("signal_rescue");
+    expect(html).toContain("move → wreckage");
+    expect(html).toContain("← now");
+    expect(html).toContain("rule <!-- -->d");
+    expect(html).not.toContain("Autonomy is off");
+  });
+
+  it("renders the NPC panel with autonomy off", () => {
+    const world = createWorld(1);
+    const html = renderToString(
+      <MantineProvider>
+        <NpcPanel world={world} />
+        <WorldHeader world={world} speed={0} />
+      </MantineProvider>,
+    );
+    expect(html).toContain("Autonomy is off");
+    expect(html).toContain("none yet");
+    expect(html).toContain("autonomy off");
   });
 });

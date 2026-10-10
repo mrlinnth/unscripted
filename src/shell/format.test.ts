@@ -8,6 +8,7 @@ import {
   fatigueLabel,
   itemLabel,
   statusLabel,
+  stepLabel,
   timeLabel,
   woodCounts,
 } from "./format";
@@ -70,5 +71,40 @@ describe("format", () => {
     };
     expect(eventSummary(started)).toBe("sleep");
     expect(eventColor(started)).toBeUndefined();
+  });
+
+  it("summarizes NPC events", () => {
+    const decision: GameEvent = {
+      minute: 0,
+      type: "npc_decision",
+      actor: "npc1",
+      data: { action: { type: "move", to: "wreckage" }, rule: "d", reason: "make_camp_safe step 1: move" },
+    };
+    expect(eventSummary(decision)).toBe("d: make_camp_safe step 1: move");
+    expect(eventColor(decision)).toBe("blue");
+
+    const plan: GameEvent = {
+      minute: 0,
+      type: "plan_changed",
+      actor: "npc1",
+      data: { goal: "make_camp_safe", steps: [{ type: "move", to: "wreckage" }, { type: "search" }] },
+    };
+    expect(eventSummary(plan)).toBe("make_camp_safe: move wreckage → search");
+
+    const done: GameEvent = {
+      minute: 0,
+      type: "goal_done",
+      actor: "npc2",
+      data: { goal: "map_island", reason: "goal reached" },
+    };
+    expect(eventSummary(done)).toBe("map_island (goal reached)");
+    expect(eventColor(done)).toBe("green");
+    expect(eventColor({ ...done, type: "goal_dropped" })).toBe("orange");
+  });
+
+  it("labels plan steps", () => {
+    expect(stepLabel({ type: "move", to: "wreckage" })).toBe("move → wreckage");
+    expect(stepLabel({ type: "search" })).toBe("search");
+    expect(stepLabel({ type: "sleep" })).toBe("sleep");
   });
 });
