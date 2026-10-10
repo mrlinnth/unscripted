@@ -34,6 +34,6 @@ export default defineConfig(() => ({
   // Vitest: the engine is pure TypeScript and runs in plain Node.
   test: {
     environment: "node",
-    include: ["src/**/*.test.ts"],
+    include: ["src/**/*.test.{ts,tsx}"],
   },
 }));
