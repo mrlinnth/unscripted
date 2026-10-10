@@ -89,6 +89,7 @@ function applyChoice(world: World, id: NpcId, choice: NpcChoice, logDecision: bo
     npc.lastReviewAt = world.minute;
   }
   npc.plan = choice.plan;
+  npc.coverTarget = choice.coverTarget;
 
   if (!logDecision) return;
   npc.lastDecision = { minute: world.minute, action: actionJson(choice.action), rule: choice.rule, reason: choice.reason };

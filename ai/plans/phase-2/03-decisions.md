@@ -108,7 +108,7 @@ Depends on: Task 3.1
 
 ---
 
-## Task 3.3: Full-Session Tests
+## Task 3.3: Full-Session Tests [DONE]
 
 Depends on: Task 3.2
 

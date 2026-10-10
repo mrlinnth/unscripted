@@ -64,6 +64,7 @@ export interface NpcView {
     goals: NpcGoalState[];
     plan: NpcPlan | null;
     wreckageSearchedOut: boolean;
+    coverTarget: LocationId | null;
   };
   behavior: NpcBehavior;
   /** Fixed game rules the planners need, as plain values. */
@@ -151,6 +152,7 @@ export function buildNpcView(world: World, id: NpcId): NpcView {
       goals: npc.goals,
       plan: npc.plan,
       wreckageSearchedOut: npc.wreckageSearchedOut,
+      coverTarget: npc.coverTarget,
     },
     behavior: world.npcBehavior,
     rules: {

@@ -47,7 +47,9 @@ describe("autonomy on", () => {
   it("never controls the player", () => {
     const world = createWorld(5, { autonomy: true });
     stepMinutes(world, 600);
-    expect(world.events.some((e) => e.actor === "player")).toBe(false);
+    // The player's body still changes (fatigue), but it takes no actions.
+    const controlled = ["npc_decision", "plan_created", "action_started", "action_rejected"];
+    expect(world.events.some((e) => e.actor === "player" && controlled.includes(e.type))).toBe(false);
     expect(world.characters.player.action).toBeNull();
   });
 

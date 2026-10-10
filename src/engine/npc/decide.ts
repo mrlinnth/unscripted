@@ -9,7 +9,7 @@ import { nextInt, type Rng } from "../rng";
 import { goalPlanners } from "./goals";
 import type { NpcGoalId, NpcPriority } from "./profiles";
 import type { DecisionRule, GoalStatus, NpcPlan } from "./state";
-import { isProtectedFor, nearestProtected, type NpcView } from "./view";
+import { isProtectedFor, nearestProtected, pathTo, type NpcView } from "./view";
 
 export interface GoalChange {
   id: NpcGoalId;
@@ -27,6 +27,8 @@ export interface NpcChoice {
   planEvent: "created" | "changed" | null;
   /** Goals that became done or dropped. Not yet saved to NPC state. */
   goalChanges: GoalChange[];
+  /** Where rules a–c are taking the NPC after this decision, or null. */
+  coverTarget: LocationId | null;
 }
 
 const PRIORITY_ORDER: Record<NpcPriority, number> = { high: 0, medium: 1, low: 2 };
@@ -59,8 +61,20 @@ function goalChanges(view: NpcView): GoalChange[] {
   return changes;
 }
 
-/** The nearest protected place. Draws from the generator only on a real tie. */
+/**
+ * Where to take cover: here if protected; else the current cover target if
+ * still reachable; else the nearest protected place. Keeping the target stops
+ * the NPC turning back halfway (away from Beach Camp it counts the camp as
+ * protected, though it may have just seen the shelter too low). Draws from
+ * the generator only on a real tie.
+ */
 function pickNearest(view: NpcView, rng: Rng): { location: LocationId; path: LocationId[] } | undefined {
+  const here = view.self.location;
+  const target = view.npc.coverTarget;
+  if (!isProtectedFor(view, here) && target !== null && target !== here && isProtectedFor(view, target)) {
+    const path = pathTo(view, target);
+    if (path && path.length > 0) return { location: target, path };
+  }
   const nearest = nearestProtected(view);
   return nearest.length > 1 ? nearest[nextInt(rng, nearest.length)] : nearest[0];
 }
@@ -137,7 +151,8 @@ export function decide(view: NpcView, rng: Rng, exclude: Action[] = []): NpcChoi
     .sort((a, b) => PRIORITY_ORDER[a.goal.priority] - PRIORITY_ORDER[b.goal.priority] || a.order - b.order)
     .map(({ goal }) => goal.id);
 
-  const base = { goalChanges: changes };
+  // Rules d and e clear the cover target; a–c set their own.
+  const base = { goalChanges: changes, coverTarget: null };
   // Rules a–c leave the plan as it is, so the NPC can pick it up afterwards.
   const keepPlan = { plan: view.npc.plan, planEvent: null };
   // a. Exhausted, or night and Tired: rest.
@@ -146,7 +161,7 @@ export function decide(view: NpcView, rng: Rng, exclude: Action[] = []): NpcChoi
     const rest = restAction(view, rng);
     if (!excluded(rest.action, exclude)) {
       const reason = rest.to === null ? `sleep: ${why}` : `go to ${rest.to} to sleep: ${why}`;
-      return { ...base, ...keepPlan, action: rest.action, rule: "a", reason };
+      return { ...base, ...keepPlan, action: rest.action, rule: "a", reason, coverTarget: rest.to };
     }
   }
 
@@ -158,7 +173,8 @@ export function decide(view: NpcView, rng: Rng, exclude: Action[] = []): NpcChoi
     if (pick && next !== undefined) {
       const action: Action = { type: "move", to: next };
       if (!excluded(action, exclude)) {
-        return { ...base, ...keepPlan, action, rule: "b", reason: `shelter: ${weather}, go to ${pick.location}` };
+        const reason = `shelter: ${weather}, go to ${pick.location}`;
+        return { ...base, ...keepPlan, action, rule: "b", reason, coverTarget: pick.location };
       }
     }
   }
@@ -169,7 +185,7 @@ export function decide(view: NpcView, rng: Rng, exclude: Action[] = []): NpcChoi
     if (!excluded(rest.action, exclude)) {
       const why = `health ${view.self.health}`;
       const reason = rest.to === null ? `rest: ${why}` : `go to ${rest.to} to rest: ${why}`;
-      return { ...base, ...keepPlan, action: rest.action, rule: "c", reason };
+      return { ...base, ...keepPlan, action: rest.action, rule: "c", reason, coverTarget: rest.to };
     }
   }
 

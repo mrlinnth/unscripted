@@ -116,6 +116,11 @@ dead NPC makes no decisions.
 "Nearest" means the shortest travel time over routes the NPC knows. If the
 NPC is already in a protected place, it does not move.
 
+Once rule a, b, or c picks a protected place, the NPC keeps heading there
+until it arrives, unless it can no longer reach it. Without this it can turn
+back halfway: away from Beach Camp it counts the camp as protected, even right
+after seeing the shelter too low there (found in Task 3.3, seed 1).
+
 - Ties (for example, two places with the same travel time) are broken with the
   session's seeded random generator.
 - If the chosen action is rejected, the NPC reaches a new decision point. To

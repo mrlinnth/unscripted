@@ -3,6 +3,7 @@
 
 import type { Action } from "../actions/types";
 import type { JsonObject } from "../actions/json";
+import type { LocationId } from "../config";
 import type { JsonValue } from "../events";
 import type { CharacterId } from "../state";
 import type { NpcConfig, NpcGoalId, NpcId, NpcPriority } from "./profiles";
@@ -42,6 +43,11 @@ export interface NpcState {
   urgentRule: DecisionRule | null;
   /** True once this NPC's own Wreckage search found nothing. */
   wreckageSearchedOut: boolean;
+  /**
+   * Where rule a, b, or c is taking the NPC, or null. Kept so it doesn't turn
+   * back halfway: away from Beach Camp it can't see the shelter value.
+   */
+  coverTarget: LocationId | null;
   trust: Partial<Record<CharacterId, number>>;
   commitments: JsonValue[];
 }
@@ -58,6 +64,7 @@ export function createNpcStates(config: NpcConfig): Record<NpcId, NpcState> {
       lastReviewAt: 0,
       urgentRule: null,
       wreckageSearchedOut: false,
+      coverTarget: null,
       trust: { ...profile.trust },
       commitments: structuredClone(profile.commitments),
     };

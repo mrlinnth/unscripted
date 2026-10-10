@@ -76,6 +76,54 @@ describe("rule a: rest when Exhausted, or at night when Tired", () => {
   });
 });
 
+describe("cover target", () => {
+  it("is set when rule a sends the NPC somewhere, and cleared when it sleeps", () => {
+    const world = createWorld(1);
+    world.characters.npc1.location = "forest";
+    setFatigue(world, "npc1", "exhausted");
+    expect(decideFor(world, "npc1").coverTarget).toBe("beach_camp");
+    world.characters.npc1.location = "beach_camp";
+    expect(decideFor(world, "npc1").coverTarget).toBeNull();
+  });
+
+  it("keeps heading for the Cave instead of turning back to a camp it saw unprotected", () => {
+    const world = createWorld(1);
+    knowAll(world, "npc2");
+    world.shelter.value = 0;
+    setFatigue(world, "npc2", "exhausted");
+
+    // At camp: sees the shelter too low, heads for the Cave.
+    expect(decideFor(world, "npc2")).toMatchObject({ action: { type: "move", to: "forest" }, coverTarget: "cave" });
+
+    // In the Forest the camp looks nearer (20 vs 25 min), but she keeps going.
+    world.characters.npc2.location = "forest";
+    world.npcs.npc2.coverTarget = "cave";
+    expect(decideFor(world, "npc2")).toMatchObject({ action: { type: "move", to: "cave" }, coverTarget: "cave" });
+
+    // Without the target she would turn back.
+    world.npcs.npc2.coverTarget = null;
+    expect(decideFor(world, "npc2").action).toEqual({ type: "move", to: "beach_camp" });
+  });
+
+  it("is dropped when the target can no longer be reached", () => {
+    const world = createWorld(1, { weather: weatherPlan([], "storm") });
+    knowAll(world, "npc2");
+    const sarah = world.characters.npc2;
+    sarah.knownRoutes = sarah.knownRoutes.filter(([a, b]) => !(a === "forest" && b === "cave"));
+    sarah.location = "hilltop";
+    world.npcs.npc2.coverTarget = "cave";
+    // Cave – Hilltop is closed in a Storm and she knows no other way to the
+    // Cave: pick fresh (Beach Camp via Forest).
+    expect(decideFor(world, "npc2")).toMatchObject({ rule: "b", coverTarget: "beach_camp" });
+  });
+
+  it("is cleared by rule d", () => {
+    const world = createWorld(1);
+    world.npcs.npc1.coverTarget = "beach_camp";
+    expect(decideFor(world, "npc1")).toMatchObject({ rule: "d", coverTarget: null });
+  });
+});
+
 describe("rule b: take cover in bad weather", () => {
   it("moves toward cover in a Storm when not protected", () => {
     const world = createWorld(1, { weather: weatherPlan([], "storm") });
@@ -166,6 +214,7 @@ describe("rule d: follow the plan", () => {
       },
       planEvent: "created",
       goalChanges: [],
+      coverTarget: null,
     });
   });
 
