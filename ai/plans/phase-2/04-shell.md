@@ -13,7 +13,7 @@ Rules for every task in this file:
 - The shell shows world truth (it is a debug view). That is fine; only the
   NPC rules are limited.
 
-## Task 4.1: NPC Panel and Autonomy Toggle
+## Task 4.1: NPC Panel and Autonomy Toggle [DONE]
 
 ### Subtasks
 - In `src/shell/runner.ts` and `src/shell/useEngine.ts`: `newSession` takes
