@@ -60,7 +60,7 @@ Facts checked in Groq docs on 2026-10-10 (re-check if anything fails):
 
 ---
 
-## Task 1.2: Measurements and Findings
+## Task 1.2: Measurements and Findings [DONE]
 
 Depends on: Task 1.1
 

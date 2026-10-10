@@ -11,14 +11,14 @@ with a strict JSON schema (`decision-schema.json`).
 
 - **Daily request quotas are separate per model.** Measured, see below.
 - **Per-minute token limits are separate per model.** Measured, see below.
-- **Daily token quotas: still to confirm** on the Groq console (manual step
-  below). Headers do not show tokens per day.
+- **Daily token quotas: listed per model** on the Groq console (200K each).
+  Not measured directly; headers do not show tokens per day.
 - **Real call size at `low` effort: about 1,900–2,000 tokens**, slightly more
   than the ~1,800 in spec §7.10.
-- **Budget verdict:** the §7.10 plan fits **if** daily token quotas are separate
-  (each model needs about 120,000 of 200,000 tokens per day at `low` effort).
-  If daily token quotas are shared, the two models together need about 234,000,
-  which is over 200,000, and the budget must be cut as §7.5 says.
+- **Budget verdict: the §7.10 plan holds; no halving needed.** Each model needs
+  about 120,000 of its 200,000 tokens per day at `low` effort. If daily tokens
+  ever turned out to be shared, both models together would need about 237,000,
+  over 200,000, and the budget would have to be cut as §7.5 says.
 - **Use `reasoning_effort: low`** (or `medium` with more output room). `high`
   breaks JSON at a 1,024-token output limit.
 
@@ -32,18 +32,23 @@ Same for both models:
 | `x-ratelimit-limit-tokens` | 8,000 | Tokens per minute |
 | `x-ratelimit-reset-requests` | used × 86.4 s | See "Daily requests refill" |
 
-## Manual step: Groq console limits (developer fills in)
+## Groq console limits (manual step, done)
 
-Open https://console.groq.com/settings/limits and copy the values:
+From the developer's Groq console, Organization Limits page (Chat Completions,
+"Current Limits"), 2026-10-10:
 
 | Model | RPM | RPD | TPM | TPD | Shared with the other model? |
 |---|---|---|---|---|---|
-| `openai/gpt-oss-120b` | | | | | |
-| `openai/gpt-oss-20b` | | | | | |
+| `openai/gpt-oss-120b` | 30 | 1K | 8K | 200K | Listed as its own row |
+| `openai/gpt-oss-20b` | 30 | 1K | 8K | 200K | Listed as its own row |
 
-Groq docs (rate limits page, checked 2026-10-10) list 30 RPM, 1K RPD, 8K TPM,
-200K TPD for both, but label them as Developer plan base limits. Confirm the
-free-tier numbers above.
+The page lists limits per model and says nothing about shared pools. The two
+limits we could measure (requests per day, tokens per minute) were separate per
+model, so tokens per day are very likely separate too. This is not measured
+directly; it would take using up 200K tokens on one model to prove.
+
+The page also says these are organization base limits and "can be customized
+per project".
 
 ## Quota separation
 
@@ -111,7 +116,7 @@ call:
 |---|---|---|---|---|
 | 120b | ~62 | ~122,000 | 200,000 TPD, 1,000 RPD | Yes |
 | 20b | ~60 | ~115,000 | 200,000 TPD, 1,000 RPD | Yes |
-| Both, if TPD is shared | ~122 | ~237,000 | 200,000 TPD | No |
+| Both, only if TPD were shared | ~122 | ~237,000 | 200,000 TPD | No |
 
 The 20b numbers assume interpreter and narration contexts as large as an NPC
 decision. They will likely be smaller.
