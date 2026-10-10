@@ -4,7 +4,8 @@
     "idleWaitMinutes": 30,
     "reviewEveryMinutes": 180,
     "shelterTarget": 80,
-    "woodReserve": 1
+    "woodReserve": 1,
+    "coverWeather": ["heavy_rain", "storm"]
   },
   "npcs": {
     "npc1": {

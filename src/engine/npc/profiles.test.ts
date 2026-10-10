@@ -10,6 +10,7 @@ describe("loadNpcConfig", () => {
       reviewEveryMinutes: 180,
       shelterTarget: 80,
       woodReserve: 1,
+      coverWeather: ["heavy_rain", "storm"],
     });
     expect(config.npcs.npc1.identity.name).toBe("Marcus Hale");
     expect(config.npcs.npc2.identity.name).toBe("Sarah Okafor");
@@ -51,6 +52,14 @@ describe("loadNpcConfig", () => {
     );
     const missing = { behavior: { lowHealth: null } } as unknown as NpcConfigOverrides;
     expect(() => loadNpcConfig(missing)).toThrow(/behavior\.lowHealth: must be a whole number above 0, got null/);
+  });
+
+  it("rejects an empty or non-text cover weather list", () => {
+    expect(() => loadNpcConfig({ behavior: { coverWeather: [] } })).toThrow(
+      /behavior\.coverWeather: must be a non-empty list/,
+    );
+    const bad = { behavior: { coverWeather: [3] } } as unknown as NpcConfigOverrides;
+    expect(() => loadNpcConfig(bad)).toThrow(/behavior\.coverWeather/);
   });
 
   it("rejects a missing NPC", () => {

@@ -40,6 +40,12 @@ describe("NPC state in the world", () => {
     expect(world.npcBehavior.lowHealth).toBe(40);
   });
 
+  it("rejects cover weather the world rules don't know", () => {
+    expect(() => createWorld(1, { npcs: { behavior: { coverWeather: ["snow"] } } })).toThrow(
+      /behavior\.coverWeather\[0\]: unknown weather state "snow"/,
+    );
+  });
+
   it("saves the forecast seen at the Hilltop", () => {
     const world = createWorld(3);
     const sarah = world.characters.npc2;

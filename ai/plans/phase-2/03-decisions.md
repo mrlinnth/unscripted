@@ -14,7 +14,7 @@ Rules for every task in this file:
   autonomy is on.
 - With autonomy off, `step` behaves exactly as today. T1–T5 stay unchanged.
 
-## Task 3.1: Decision Rules a–e
+## Task 3.1: Decision Rules a–e [DONE]
 
 ### Subtasks
 - Create `src/engine/npc/decide.ts` with

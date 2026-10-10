@@ -32,6 +32,11 @@ export interface CreateWorldOptions {
 export function createWorld(seed: number, options: CreateWorldOptions = {}): World {
   const rules = loadWorldRules(options.rules);
   const npcConfig = loadNpcConfig(options.npcs);
+  npcConfig.behavior.coverWeather.forEach((state, i) => {
+    if (!rules.weather.states.includes(state)) {
+      throw new Error(`npcs: behavior.coverWeather[${i}]: unknown weather state "${state}"`);
+    }
+  });
   const rng = createRng(seed);
 
   // Always roll in the fixed order (weather, then search order), even when a

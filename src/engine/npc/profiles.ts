@@ -61,6 +61,8 @@ export interface NpcBehavior {
   shelterTarget: number;
   /** Dry wood bundles Marcus keeps at Beach Camp. */
   woodReserve: number;
+  /** Weather that sends an unprotected NPC to cover (rule b). */
+  coverWeather: string[];
 }
 
 export interface NpcConfig {
@@ -105,7 +107,11 @@ export function validateNpcConfig(config: NpcConfig): void {
 
   // Behavior.
   const behavior = config.behavior as unknown as Record<string, unknown>;
-  const behaviorKeys: (keyof NpcBehavior)[] = [
+  // Only the shape here; createWorld checks the names against the world rules.
+  if (!isStringList(behavior.coverWeather) || behavior.coverWeather.length === 0) {
+    throw new NpcConfigError("behavior.coverWeather", "must be a non-empty list of weather states");
+  }
+  const behaviorKeys: Exclude<keyof NpcBehavior, "coverWeather">[] = [
     "lowHealth",
     "idleWaitMinutes",
     "reviewEveryMinutes",
