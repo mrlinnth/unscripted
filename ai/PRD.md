@@ -26,10 +26,11 @@ stories, within free AI provider limits. See spec §1.4.
 
 The developer, playing and testing on a Linux desktop.
 
-## Current Scope: Phase 1 Only
+## Current Scope: Phase 2
 
-Phase 1 is "Deterministic World" plus the AI gateway spike (spec §10). It
-includes no AI in the game. Later phases are planned after Phase 1 is done.
+Phase 1 ("Deterministic World" plus the AI gateway spike, spec §10) is done.
+Phase 2 is "Autonomous Characters" (see the Phase 2 section below). Neither
+phase has AI in the game. Later phases are planned after Phase 2 is done.
 
 ## Core Features (Phase 1)
 
@@ -100,6 +101,40 @@ Findings go in a markdown file. Not wired into the app. Spec: §7.5, §7.10, §1
   both models, separate or shared quotas, and real token sizes.
 
 Full pilot success is defined in spec §8.8. It is not a Phase 1 goal.
+
+## Phase 2: Autonomous Characters
+
+Spec: §3, §10 Phase 2. Details: [plans/phase-2/requirements.md](plans/phase-2/requirements.md).
+
+### Core features (Phase 2)
+
+**NPC profiles.** Two NPCs (draft: Marcus Hale and Sarah Okafor) in
+`src/engine/config/npcs.json`: identity text, goals, starting trust. Identities
+are a draft until the developer approves them in spec §9. Priority 1.
+Depends on: Phase 1.
+
+**Goals and plans.** Goals with done and dropped checks, turned into plans made
+of A.12 actions. At least one goal per NPC competes with the signal fire.
+Priority 1. Depends on: NPC profiles.
+
+**Rule-based decisions.** A fixed rule list (rest, take cover, recover, follow
+plan, wait) run at decision points, reading only what the NPC could know.
+Seeded tie-breaks, every decision logged. Priority 2. Depends on: Goals and
+plans.
+
+**Dev shell NPC view.** Goals, current plan, last decision, autonomy on/off.
+Priority 3. Depends on: Rule-based decisions.
+
+### Out of scope (Phase 2)
+
+AI, memory and beliefs, trust changes, social actions, deception, injuries
+(developer decision: the spec defines no injury rules), player UI, saving.
+
+### Success criteria (Phase 2)
+
+- A no-input 48-hour session runs to the end with both NPCs planning and
+  acting on their own.
+- Same seed gives identical event logs, and T1–T5 still pass.
 
 ## Phases
 
